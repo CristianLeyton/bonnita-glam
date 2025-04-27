@@ -1,0 +1,74 @@
+---
+import Logo from '@components/resources/Logo.astro';
+import HamburguerIcon from '@icons/HamburguerIcon.astro';
+import SetTheme from '@components/resources/SetTheme.astro';
+import WishListIcon from './resources/icons/WishListIcon.astro';
+
+---
+
+<header id="header" class="flex flex-wrap container mx-auto sticky top-4 overflow-hidden md:flex-nowrap justify-between items-center my-4 px-3 border border-pink-100 bg-secondary rounded-[2rem] dark:bg-neutral-900 dark:border-neutral-700 h-[70px] z-50">
+    <a href="/" class="w-44 ml-3 scale-90"><Logo /></a>
+
+    <div class="flex items-start w-full md:w-auto md:items-center gap-2 relative">
+        <div class="buttons flex items-center order-1 absolute md:relative -top-[50px] right-2 md:right-0 md:top-0 gap-3 md:gap-2" >
+            <button title="Cambiar tema"><SetTheme /></button>
+            <a href="/wishlist" title="Lista de deseos" class="relative"> <WishListIcon/> <span class="absolute min-w-4 h-4 -top-0.5 -right-0.5 text-center bg-orange-400 rounded-full text-white text-[0.6rem] grid place-content-center font-semibold" id="counterList">0</span> </a>
+            <button title="Menú" id="menu-icon"><HamburguerIcon /></button>
+        </div>
+
+        <nav class="flex flex-col p-2 *:py-2 last:mb-2 md:last:mb-0 md:flex-row md:flex gap-2 md:gap-5 *:font-semibold *:text-sm *:transition w-full">
+                <a href="/#inicio"  title="Inicio" class="hover:text-orange-500 active:text-black dark:active:text-white">Inicio</a>
+                <a href="/#categorias"  title="Categorias" class="hover:text-orange-500 active:text-black dark:active:text-white">Categorias</a>
+                <a href="/categories"  title="Productos" class="hover:text-orange-500 active:text-black dark:active:text-white">Productos</a>
+                <a href="/#nosotros"  title="Nosotros" class="hover:text-orange-500 active:text-black dark:active:text-white">Nosotros</a>
+                <a href="#contacto" title="Contacto"  class="hover:text-orange-500 active:text-black dark:active:text-white">Contacto</a>
+        </nav>
+        </div>
+    </header>
+
+<style>
+    :root {
+  interpolate-size: allow-keywords;
+}
+    #header {
+        transition: height 0.3s ease-out;
+        backdrop-filter: blur(20px);
+    }
+</style>
+
+<script is:inline>
+    document.addEventListener('astro:page-load', () => {
+    const headerElement = document.querySelector("#header");
+    const counterList = document.querySelector("#counterList")
+
+    setCounterList()
+
+    function setCounterList() {
+        const wishList = JSON.parse(localStorage.getItem("wishList"));
+        if (wishList) {
+            counterList.textContent = wishList.length;   
+        }
+    }
+
+    window.addEventListener("user:addedProduct", setCounterList);
+
+    document.querySelector('#menu-icon').addEventListener('click', (event)=> {
+        headerElement.classList.toggle('h-[70px]');
+        
+        // Evitar que el click en el botón cierre el menú inmediatamente
+        event.stopPropagation();
+
+        // Escuchar clics en cualquier lugar del documento
+        document.addEventListener("click", (event) => {
+        // Verificar si el clic fue fuera del submenú y del botón
+        if (
+            //@ts-ignore
+/*             !headerElement.contains(event.target) && */ //Este no cierra el menu cuando doy click en algun item del mismo
+            event.target !== headerElement //Este si cierra el menu cuando clickeo algun elemento de dentro del menu, o fuera
+        ) {
+            headerElement.classList.add("h-[70px]");
+        }
+        });
+    })
+});
+</script>

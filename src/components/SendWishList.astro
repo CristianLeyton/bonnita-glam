@@ -1,0 +1,263 @@
+---
+import CopyIcon from "./resources/icons/CopyIcon.astro";
+import EmailIcon from "./resources/icons/EmailIcon.astro";
+import WhatsAppIcon from "./resources/icons/WhatsAppIcon.astro";
+import DownloadIcon from "@components/resources/icons/DownloadIcon.astro";
+---
+
+<header
+  class="flex gap-2 w-full justify-between items-center border-b pb-2 dark:border-neutral-600"
+>
+  <h3 class="font-bold">Enviar</h3>
+
+  <div class="flex items-center *:rounded text-white gap-2">
+    <button
+      id="btnDownload"
+      class="p-1 hover:-translate-y-0.5 transition bg-indigo-500"
+      title="Descargar Imagen"
+      ><DownloadIcon />
+    </button>
+    <button
+      id="btnCopy"
+      class="p-1 hover:-translate-y-0.5 transition bg-orange-500"
+      title="Copiar"><CopyIcon /></button
+    >
+    <a
+      href="#"
+      id="btnEmail"
+      class="p-1 hover:-translate-y-0.5 transition bg-blue-500"
+      title="Enviar por Mail"><EmailIcon /></a
+    >
+    <a
+      href="#"
+      id="btnWsp"
+      target="_blank"
+      class="p-1 hover:-translate-y-0.5 transition bg-green-500"
+      title="Enviar por WhatsApp"><WhatsAppIcon /></a
+    >
+  </div>
+</header>
+
+<span id="totalWishList" class="w-full p-1">
+  <div
+    class="w-full text-left grid grid-cols-5 font-semibold text-base md:text-sm xl:text-base"
+  >
+  <span class="col-span-3"> Nombre </span>
+    <span class="text-ellipsis text-center overflow-hidden pb-2">
+      <span class="hidden xl:inline-block">Cantidad</span>
+      <span class="inline-block xl:hidden">Cant.</span>
+    </span>
+    <span class="text-right"> Precio </span>
+  </div>
+
+  <div
+    id="sendWishList"
+    class="w-full text-left grid grid-cols-5 text-base md:text-sm xl:text-base pb-2"
+  >
+  </div>
+
+  <div
+    class="border-t dark:border-neutral-600 flex justify-between w-full mt-1 py-2 font-bold"
+  >
+    <h3 class="">Total:</h3>
+    <span
+      >
+      <span id="totalList">0</span></span
+    >
+  </div>
+</span>
+
+<style>
+  #totalWishList {
+
+  }
+</style>
+
+<script>
+  import html2canvas from "html2canvas";
+
+  function getWishList() {
+    //Si es la primera vez y no existe la lista de deseos, la creo
+    let WishList = JSON.parse(localStorage.getItem("wishList")) || [];
+    if (WishList.length === 0) {
+      localStorage.setItem("wishList", JSON.stringify([])); //Comprueba si ya existe o no, y la crea
+    }
+    return WishList;
+  }
+
+  function calculateWishList() {
+    const localWishList = getWishList();
+    const sendWishList = document.querySelector("#sendWishList");
+    const totalList = document.querySelector("#totalList");
+
+    if (sendWishList) {
+      if (localWishList.length === 0) {
+        sendWishList.innerHTML = `<span class='col-span-full text-center inline-block'>¡Aún no hay nada por aquí!</span>`;
+      } else {
+        sendWishList.innerHTML = ""; //Reseteo la lista
+
+        localWishList.forEach((item) => {
+          let cant = document.createElement("span");
+          cant.classList.add("text-center");
+          cant.textContent = item.quantity;
+
+          let name = document.createElement("span");
+          name.classList.add("text-left");
+          name.classList.add("col-span-3");
+          name.textContent = item.title;
+
+          let price = document.createElement("span");
+          price.classList.add("text-right");
+          //@ts-ignore
+          price.textContent = `$${item.quantity * item.price}`;
+
+          sendWishList.insertAdjacentElement("beforeend", name);
+          sendWishList.insertAdjacentElement("beforeend", cant);
+          sendWishList.insertAdjacentElement("beforeend", price);
+        });
+      }
+
+      //Suma total
+      let sum = 0;
+      localWishList.forEach((item) => {
+        sum = sum + Number(item.quantity * item.price);
+      });
+      //@ts-ignore
+      totalList.innerHTML = `$${sum}`;
+
+      //Configuro los botones para que se puedan enviar los datos por ellos
+      setBtnWsp();
+      setBtnEmail();
+      // Asigna la función al evento de clic del botón
+      document
+        .querySelector("#btnCopy")
+        .addEventListener("click", copyListToClipboard);
+    }
+  }
+
+  function setBtnWsp() {
+    const productos = getWishList();
+    const numeroTelefono = "543875459077";
+    const btnWsp = document.querySelector("#btnWsp");
+
+    // Formatea los datos en un mensaje de texto
+    let mensaje = "Mi lista:\n\n";
+    let total = 0;
+
+    productos.forEach((producto, index) => {
+      mensaje += `${index + 1}. ${producto.title}\n`;
+      mensaje += `      Cantidad: ${producto.quantity}\n`;
+      mensaje += `      Precio: $${producto.price * producto.quantity}\n`;
+      mensaje += `      SKU: ${producto.sku}\n\n`;
+
+      total = total + producto.price * producto.quantity;
+    });
+
+    mensaje += `*Total: $${total}*`;
+
+    // Codifica el mensaje para incluirlo en la URL
+    const mensajeCodificado = encodeURIComponent(mensaje);
+
+    // Crea la URL de WhatsApp
+    const urlWhatsApp = `https://api.whatsapp.com/send/?phone=${numeroTelefono}&text=${mensajeCodificado}`;
+
+    btnWsp.setAttribute("href", urlWhatsApp);
+  }
+
+  function setBtnEmail() {
+    const productos = getWishList();
+    const email = "leytoncristian96@gmail.com";
+    const btnEmail = document.querySelector("#btnEmail");
+
+    // Formatea los datos en un mensaje de texto
+    let mensaje = "Mi lista:\n\n";
+    let total = 0;
+
+    productos.forEach((producto, index) => {
+      mensaje += `${index + 1}. ${producto.title}\n`;
+      mensaje += `      Cantidad: ${producto.quantity}\n`;
+      mensaje += `      Precio: $${producto.price * producto.quantity}\n`;
+      mensaje += `      SKU: ${producto.sku}\n\n`;
+
+      total += producto.price * producto.quantity;
+    });
+
+    mensaje += `Total: $${total}`;
+
+    // Codifica el mensaje para incluirlo en el cuerpo del correo
+    const mensajeCodificado = encodeURIComponent(mensaje);
+
+    // Asunto del correo
+    const asunto = encodeURIComponent("Lista de Productos");
+
+    // Crea la URL de mailto
+    const urlEmail = `mailto:${email}?subject=${asunto}&body=${mensajeCodificado}`;
+
+    btnEmail.setAttribute("href", urlEmail);
+  }
+
+  function copyListToClipboard() {
+    const productos = getWishList();
+
+    // Formatea los datos en un mensaje de texto
+    let mensaje = "Mi lista:\n\n";
+    let total = 0;
+
+    productos.forEach((producto, index) => {
+      mensaje += `${index + 1}. ${producto.title}\n`;
+      mensaje += `      Cantidad: ${producto.quantity}\n`;
+      mensaje += `      Precio: $${producto.price * producto.quantity}\n`;
+      mensaje += `      SKU: ${producto.sku}\n\n`;
+
+      total += producto.price * producto.quantity;
+    });
+
+    mensaje += `Total: $${total}`;
+
+    // Usa la API de Portapapeles para copiar el mensaje
+    navigator.clipboard
+      .writeText(mensaje)
+      .then(() => {
+        window.dispatchEvent(
+          new CustomEvent("user:addedProduct", {
+            detail: "Se copio la lista al portapapeles.",
+          })
+        );
+      })
+      .catch((err) => {
+        console.error("Error al copiar al portapapeles: ", err);
+      });
+  }
+
+  function downloadAsImage() {
+    const wishList = document.querySelector("#totalWishList");
+    if (!wishList) return;
+
+    // Configurar opciones para html2canvas
+    const options = {
+      scale: 1.5, // Aumentar la resolución
+      backgroundColor: "#ffffff", // Fondo blanco
+      logging: false,
+      useCORS: true, // Permitir imágenes de otros dominios
+    };
+
+    //@ts-ignore
+    html2canvas(wishList, options).then((canvas) => {
+      // Crear un enlace para descargar
+      const link = document.createElement("a");
+      link.download = "mi-lista-de-deseos.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    });
+  }
+
+  document.addEventListener("astro:page-load", calculateWishList);
+  document.addEventListener("astro:page-load", () => {
+    const btnDownload = document.querySelector("#btnDownload");
+    if (btnDownload) {
+      btnDownload.addEventListener("click", downloadAsImage);
+    }
+  });
+  window.addEventListener("user:addedProduct", calculateWishList);
+  window.addEventListener("user:editQuantityProduct", calculateWishList);
+</script>

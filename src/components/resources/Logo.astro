@@ -1,0 +1,33 @@
+---
+import logo from '/public/src/images/logo.png';
+import logoDark from '/public/src/images/logo-dark.png';
+---
+
+<span class="logoData " data-logo={logo.src} data-logo-dark={logoDark.src}>
+  <img id="logo" src={logo.src} alt="Logo" title="Logo"> 
+</span> 
+
+<script>
+
+// Función que ejecuta la lógica de cambio de logo
+function updateLogoBasedOnTheme() {
+  const theme = localStorage.getItem('theme');
+  const logo = document.querySelector('#logo');
+  const logoData = document.querySelector('.logoData');
+
+  const urlLogo = logoData.getAttribute('data-logo');
+  const urlLogoDark = logoData.getAttribute('data-logo-dark');
+
+  if (theme == 'dark') {
+    logo.setAttribute('src', urlLogoDark);
+  } else {
+    logo.setAttribute('src', urlLogo);
+  }
+}
+
+// Ejecuta la función cuando se carga la página
+document.addEventListener('astro:page-load', updateLogoBasedOnTheme);
+
+// Ejecuta la función al escuchar el evento `user:toggleTheme`
+window.addEventListener("user:toggleTheme", updateLogoBasedOnTheme);
+</script>
