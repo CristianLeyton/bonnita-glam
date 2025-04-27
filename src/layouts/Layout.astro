@@ -1,59 +1,61 @@
 ---
-import '../styles/global.css';
-import background from '../assets/background.svg';
+import "../styles/global.css";
 const { title } = Astro.props;
-import Header from '../components/Header.astro';
+import Header from "../components/Header.astro";
 import { ClientRouter } from "astro:transitions";
+import Footer from "../components/Footer.astro";
 ---
 
 <!doctype html>
 <html lang="es" class="scroll-smooth">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.ico" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
 
-		<ClientRouter />
-	</head>
-	<body>
-		<img id="background" src={background.src} alt="" fetchpriority="high"/>
-		<Header />
-	<main class="">
-		<slot />
-	</main>
-	</body>
+    <ClientRouter />
+  </head>
+  <body>
+    <div
+      class="fixed inset-0 -z-10 w-full bg-white dark:hidden [background:radial-gradient(125%_125%_at_50%_10%,#fff6f7_50%,#95001C_100%)]"
+    >
+    </div>
+    <div
+      class="fixed inset-0 -z-10 w-full items-center px-5 py-24 hidden dark:block [background:radial-gradient(125%_125%_at_50%_10%,#1d1d1d_50%,#95001C_100%)]"
+    >
+    </div>
+	</div>
+  <main class="container mx-auto px-2">
+      <Header />
+      <slot />
+    </main>
+    <Footer />
+  </body>
 </html>
 
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
 
-	#background {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		z-index: -1;
-		filter: blur(100px);
-	}
+<style is:global>
+  p {
+    text-wrap: pretty;
+  }
 
-	#container {
-		font-family: Inter, Roboto, 'Helvetica Neue', 'Arial Nova', 'Nimbus Sans', Arial, sans-serif;
-		height: 100%;
-		width: 100%;
-		margin: 0 auto;
-	}
+  @font-face {
+    font-family: "Iceberg";
+    src: url("/src/fonts/Iceberg.ttf");
+  }
 
-	main {
-		height: 100%;
-		display: flex;
-		justify-content: center;
-	}
+  .font-iceberg {
+    font-family: "Iceberg";
+  }
+
+  @font-face {
+    font-family: "Onest";
+    src: url("/src/fonts/Onest.ttf");
+  }
+
+  .font-onest {
+    font-family: "Onest";
+  }
 </style>
