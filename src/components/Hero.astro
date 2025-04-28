@@ -87,6 +87,7 @@ import image3 from "/public/src/images/3.webp";
     setInterval(() => {
       currentSlide = (currentSlide + 1) % slides;
       if (slider) {
+      //@ts-ignore
         slider.style.transform = `translateX(-${currentSlide * 100}%)`;
       }
     }, 3000);

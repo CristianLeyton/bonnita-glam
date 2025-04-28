@@ -4,6 +4,7 @@ const { title } = Astro.props;
 import Header from "../components/Header.astro";
 import { ClientRouter } from "astro:transitions";
 import Footer from "../components/Footer.astro";
+const description = "Tienda de maquillaje y cosméticos en Salta | Bonnita Glam Makeup";
 ---
 
 <!doctype html>
@@ -11,23 +12,28 @@ import Footer from "../components/Footer.astro";
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description}>
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
 
+    <meta property="og:title" content={title}>
+    <meta property="og:description" content={description}>
+    <meta property="og:image" content="/public/src/images/logoB.jpg">
+    <meta name="twitter:image" content="/public/src/images/logoB.jpg">
     <ClientRouter />
   </head>
-  <body class="grid min-h-dvh row-auto">
-    <Header />
-  <main class="container mx-auto px-2 ">
+  <body class="flex flex-col justify-between min-h-dvh">
     <div
-    class="fixed inset-0 -z-10 w-full bg-white dark:hidden [background:radial-gradient(125%_125%_at_50%_10%,#fff6f7_50%,#95001C_100%)]"
+    class="fixed top-0 h-screen w-full inset-0 -z-10 bg-white dark:hidden [background:radial-gradient(125%_125%_at_50%_10%,#fff6f7_50%,#95001C_100%)]"
   >
   </div>
   <div
-    class="fixed inset-0 -z-10 w-full items-center px-5 py-24 hidden dark:block [background:radial-gradient(125%_125%_at_50%_10%,#1e1d1d_60%,#95001C_100%)]"
+    class="fixed top-0 h-screen w-full inset-0 -z-10 items-center px-5 py-24 hidden dark:block [background:radial-gradient(125%_125%_at_50%_10%,#1e1d1d_60%,#95001C_100%)]"
   >
   </div>
+    <Header />
+  <main class="container mx-auto px-2 ">
       <slot />
   </main>
     <Footer />
