@@ -5,6 +5,7 @@ import Header from "../components/Header.astro";
 import { ClientRouter } from "astro:transitions";
 import Footer from "../components/Footer.astro";
 const description = "Tienda de maquillaje y cosméticos en Salta | Bonnita Glam Makeup";
+import logoB from "/public/src/images/logoB.jpg";
 ---
 
 <!doctype html>
@@ -19,8 +20,8 @@ const description = "Tienda de maquillaje y cosméticos en Salta | Bonnita Glam 
 
     <meta property="og:title" content={title}>
     <meta property="og:description" content={description}>
-    <meta property="og:image" content="/public/src/images/logoB.jpg">
-    <meta name="twitter:image" content="/public/src/images/logoB.jpg">
+    <meta property="og:image" content={logoB.src}>
+    <meta name="twitter:image" content={logoB.src}>
     <ClientRouter />
   </head>
   <body class="flex flex-col justify-between min-h-dvh">
