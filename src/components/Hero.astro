@@ -2,33 +2,93 @@
 import ButtonPrimary from "@components/resources/ButtonPrimary.astro";
 import ButtonSecondary from "@components/resources/ButtonSecondary.astro";
 import ArrowR from "./resources/icons/ArrowRIcon.astro";
-
+import image1 from "/public/src/images/1.webp";
+import image2 from "/public/src/images/2.webp";
+import image3 from "/public/src/images/3.webp";
 ---
 
-<section id="inicio" class="p-2 pt-3 min-h-dvh md:items-center gap-8 scroll-m-80 md:scroll-m-28 grid md:grid-cols-2 dark:text-secondary">
+<section
+  id="inicio"
+  class="p-2 py-3 md:items-center gap-8 scroll-m-80 md:scroll-m-28 grid md:grid-cols-2 dark:text-secondary"
+>
   <article class="flex flex-col gap-4 xl:translate-x-14 2xl:translate-x-24">
-    <h1 class="text-4xl sm:text-4xl lg:text-5xl 2xl:text-6xl font-bold text-nowrap">
+    <h1
+      class="text-4xl sm:text-4xl lg:text-5xl 2xl:text-6xl font-bold text-nowrap"
+    >
       Bienvenida <br /> a <span class="text-primary dark:text-rose-200"
         >Bonnita</span
       >
     </h1>
 
-    <p class="text-base lg:text-lg 2xl:text-xl ">
-      Crea tu pedido con tus productos favoritos y
-      contactanos para confirmar el pedido. Escribenos por <a
+    <p class="text-base lg:text-lg 2xl:text-xl">
+      Crea tu pedido con tus productos favoritos y contactanos para confirmar el
+      pedido. Escribenos por <a href="#" class="font-semibold">correo</a> o por <a
         href="#"
-        class="font-semibold">correo</a
-      > o por <a href="#" class="font-semibold">whatsapp</a>.
+        class="font-semibold">whatsapp</a
+      >.
     </p>
 
     <div class="flex flex-col md:flex-row gap-3 w-full">
       <ButtonPrimary href="/categories" text="Armar pedido" class="w-full">
-        <ArrowR className="ml-0.5 -mr-2"/>
+        <ArrowR className="ml-0.5 -mr-2" />
       </ButtonPrimary>
       <ButtonSecondary href="#contacto" text="Contactanos" />
     </div>
   </article>
-  <article class="">
-
+  <article class="justify-self-center">
+    <div
+      class="relative h-[380px] md:size-[400px] overflow-hidden rounded-xl custom-mask"
+    >
+      <div class="flex transition-transform duration-500 h-full" id="slider">
+        <img
+          src={image1.src}
+          alt="Imagen 1"
+          class="w-full h-full object-cover flex-shrink-0"
+        />
+        <img
+          src={image2.src}
+          alt="Imagen 2"
+          class="w-full h-full object-cover flex-shrink-0"
+        />
+        <img
+          src={image3.src}
+          alt="Imagen 3"
+          class="w-full h-full object-cover flex-shrink-0"
+        />
+      </div>
+    </div>
   </article>
 </section>
+<style>
+  .custom-mask {
+    mask-image: url('data:image/svg+xml;utf8,<svg viewBox="14 16 200 200" xmlns="http://www.w3.org/2000/svg"><path fill="black" d="M87,63Q86,76,74,81.5Q62,87,48.5,92Q35,97,27.5,84.5Q20,72,14.5,61Q9,50,11,36.5Q13,23,25,16.5Q37,10,50.5,8Q64,6,76,14Q88,22,88,36Q88,50,87,63Z" style="transform: scale(2.3)" /></svg>');
+    -webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="14 16 200 200" xmlns="http://www.w3.org/2000/svg"><path fill="black" d="M87,63Q86,76,74,81.5Q62,87,48.5,92Q35,97,27.5,84.5Q20,72,14.5,61Q9,50,11,36.5Q13,23,25,16.5Q37,10,50.5,8Q64,6,76,14Q88,22,88,36Q88,50,87,63Z" style="transform: scale(2.3)" /></svg>');
+    mask-size: contain;
+    -webkit-mask-size: contain;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-position: center;
+  }
+
+  @media (max-width: 768px) {
+    .custom-mask {
+      mask-image: none;
+      -webkit-mask-image: none;
+    }
+  }
+</style>
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const slider = document.querySelector("#slider");
+    let currentSlide = 0;
+    const slides = 3;
+
+    setInterval(() => {
+      currentSlide = (currentSlide + 1) % slides;
+      if (slider) {
+        slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+      }
+    }, 3000);
+  });
+</script>

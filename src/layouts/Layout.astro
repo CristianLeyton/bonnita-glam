@@ -17,20 +17,19 @@ import Footer from "../components/Footer.astro";
 
     <ClientRouter />
   </head>
-  <body>
+  <body class="grid min-h-dvh row-auto">
+    <Header />
+  <main class="container mx-auto px-2 ">
     <div
-      class="fixed inset-0 -z-10 w-full bg-white dark:hidden [background:radial-gradient(125%_125%_at_50%_10%,#fff6f7_50%,#95001C_100%)]"
-    >
-    </div>
-    <div
-      class="fixed inset-0 -z-10 w-full items-center px-5 py-24 hidden dark:block [background:radial-gradient(125%_125%_at_50%_10%,#1d1d1d_50%,#95001C_100%)]"
-    >
-    </div>
-	</div>
-  <main class="container mx-auto px-2">
-      <Header />
+    class="fixed inset-0 -z-10 w-full bg-white dark:hidden [background:radial-gradient(125%_125%_at_50%_10%,#fff6f7_50%,#95001C_100%)]"
+  >
+  </div>
+  <div
+    class="fixed inset-0 -z-10 w-full items-center px-5 py-24 hidden dark:block [background:radial-gradient(125%_125%_at_50%_10%,#1e1d1d_60%,#95001C_100%)]"
+  >
+  </div>
       <slot />
-    </main>
+  </main>
     <Footer />
   </body>
 </html>
