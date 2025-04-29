@@ -8,12 +8,12 @@ import EmailIcon from "@components/resources/icons/EmailIcon.astro";
 import MapPinIcon from "./resources/icons/MapPinIcon.astro";
 const CDL = "{CDL}";
 
-const contact = {
+export const contact = {
   x: "#",
   facebook: "#",
-  instagram: "#",
-  whatsapp: "#",
-  phone: "#",
+  instagram: "https://www.instagram.com/bonnita.glam/",
+  whatsapp: "https://api.whatsapp.com/send/?phone=5493872571890&text=Hola!&type=phone_number&app_absent=0",
+  phone: "5493872571890",
   ubicacion: "#",
   email: '#'
 };
@@ -42,8 +42,8 @@ const contact = {
        -->
       <a href={contact.instagram} class="hover:-translate-y-0.5" title="Cuenta de Instagram"><InstagramIcon className="" /></a>
       <a href={contact.whatsapp} class="hover:-translate-y-0.5" title="Enviar WhatsApp"><WhatsAppIcon className="" /></a>
-      <a href={contact.email} class="hover:-translate-y-0.5" title="Enviar Correo"><EmailIcon className="" /></a>
-      <a href={contact.phone} class="hover:-translate-y-0.5" title="Llamar"><PhoneIcon className="" /></a>
+      <a href=`mailto:${contact.email}` class="hover:-translate-y-0.5" title="Enviar Correo"><EmailIcon className="" /></a>
+      <a href=`tel:${contact.phone}` class="hover:-translate-y-0.5" title="Llamar"><PhoneIcon className="" /></a>
     </div>
   </div>
 

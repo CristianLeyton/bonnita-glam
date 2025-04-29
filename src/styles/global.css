@@ -3,7 +3,18 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --color-primary: #95001C;
-    --color-secondary: #fff6f7;
+  --color-primary: #95001c;
+  --color-secondary: #fff6f7;
+}
+
+.card {
+  @apply grid grid-cols-3 justify-items-end items-center w-full md:w-auto bg-secondary/60 dark:bg-rose-200/80 dark:text-gray-800 shadow-sm font-semibold py-2 px-8 md:p-4 md:gap-2 rounded-lg hover:-translate-y-1 transition;
+
+  & h3 {
+    @apply text-lg text-nowrap col-span-2 justify-self-start md:pl-5;
   }
 
+  & img {
+    @apply max-w-12 md:max-w-28 dark:bg-neutral-200 rounded-lg transition;
+  }
+}

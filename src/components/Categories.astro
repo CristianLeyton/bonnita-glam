@@ -1,0 +1,71 @@
+---
+import Title from "@components/resources/Title.astro";
+import Card from "@components/resources/Card.astro";
+---
+
+<section id="categorias" class="py-5 px-2 scroll-m-80 md:scroll-m-20">
+  <Title title="Nuestras categorias" subtitle="Conoce nuestro productos" />
+
+  <article
+    class="parent grid grid-cols-1 items-center justify-center flex-wrap py-5 gap-5 md:grid-cols-2"
+  >
+    {
+      Array(6)
+        .fill(0)
+        .map((_, index) => (
+          <div class="card h-[144px] animate-pulse" key={index}></div>
+        ))
+    }
+  </article>
+</section>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const urlApi = "https://admin.bonnitaglammakeup.com.ar";
+    const parent = document.querySelector(".parent");
+    const childrenCount = parent.children.length;
+
+    if (parent) {
+      if (childrenCount % 3 === 0) {
+        parent.classList.add("lg:grid-cols-3");
+      } else {
+        parent.classList.add("lg:grid-cols-2"); // Clase por defecto
+        parent.classList.add("2xl:grid-cols-4");
+      }
+    }
+
+    //Solo para hacer el slug:
+    function convertirAStringAmigable(texto: string) {
+      let stringAmigable = texto.toLowerCase().replace(/[^a-z0-9\s]/g, "");
+      stringAmigable = stringAmigable.replace(/\s+/g, "-");
+      stringAmigable = stringAmigable.replace(/-+/g, "-");
+      stringAmigable = stringAmigable.replace(/^-+|-+$/g, "");
+
+      return stringAmigable;
+    }
+
+    fetch(`${urlApi}/api/categories`)
+      .then((response) => response.json())
+      .then((data) => {
+        const categories = data.data;
+        parent.innerHTML = "";
+        categories.forEach((category) => {
+          const slug = convertirAStringAmigable(category.name);
+          const url = "/categorias/" + slug;
+          const card = document.createElement("a");
+          card.href = url;
+          card.classList.add("parent");
+          card.innerHTML = `
+            <a class="card">
+              <h3 class="card-title">${category.name}</h3>
+              <span><img src="${urlApi}/storage_public/${category.urlImage}" alt="${category.name}" class="card-image"></span>
+            </a>
+          `;
+          parent.appendChild(card);
+        });
+      })
+      .catch((error) => {
+        console.error("Error al obtener las categorías:", error);
+      });
+  });
+</script>
