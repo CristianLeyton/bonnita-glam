@@ -13,7 +13,7 @@ import Card from "@components/resources/Card.astro";
       Array(6)
         .fill(0)
         .map((_, index) => (
-          <div class="card h-[144px] animate-pulse" key={index}></div>
+          <div class="card h-[64px] md:h-[144px] animate-pulse" key={index}></div>
         ))
     }
   </article>
@@ -51,7 +51,7 @@ import Card from "@components/resources/Card.astro";
         parent.innerHTML = "";
         categories.forEach((category) => {
           const slug = convertirAStringAmigable(category.name);
-          const url = "/categorias/" + slug;
+          const url = "/categorias?nombre=" + slug;
           const card = document.createElement("a");
           card.href = url;
           card.classList.add("parent");
