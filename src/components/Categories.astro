@@ -13,7 +13,7 @@ import Card from "@components/resources/Card.astro";
       Array(6)
         .fill(0)
         .map((_, index) => (
-          <div class="card h-[64px] md:h-[144px] animate-pulse" key={index}></div>
+          <div class="card h-[64px] md:h-[144px] animate-pulse" ></div>
         ))
     }
   </article>
@@ -23,9 +23,9 @@ import Card from "@components/resources/Card.astro";
   document.addEventListener("astro:page-load", () => {
     const urlApi = "https://admin.bonnitaglammakeup.com.ar";
     const parent = document.querySelector(".parent");
-    const childrenCount = parent.children.length;
+    const childrenCount = parent?.children.length;
 
-    if (parent) {
+    if (parent && childrenCount) {
       if (childrenCount % 3 === 0) {
         parent.classList.add("lg:grid-cols-3");
       } else {
@@ -48,10 +48,12 @@ import Card from "@components/resources/Card.astro";
       .then((response) => response.json())
       .then((data) => {
         const categories = data.data;
-        parent.innerHTML = "";
-        categories.forEach((category) => {
+        if (parent) {
+          parent.innerHTML = "";
+        }
+        categories.forEach((category:any) => {
           const slug = convertirAStringAmigable(category.name);
-          const url = "/categorias?nombre=" + slug;
+          const url = "/productos?category_slug=" + slug;
           const card = document.createElement("a");
           card.href = url;
           card.classList.add("parent");
@@ -61,7 +63,7 @@ import Card from "@components/resources/Card.astro";
               <span><img src="${urlApi}/storage_public/${category.urlImage}" alt="${category.name}" class="card-image"></span>
             </a>
           `;
-          parent.appendChild(card);
+          parent?.appendChild(card);
         });
       })
       .catch((error) => {

@@ -1,0 +1,336 @@
+---
+import ArrowR from "@components/resources/icons/ArrowRIcon.astro";
+import Layout from "@layouts/Layout.astro";
+import HeartIcon from "@components/resources/icons/HeartIcon.astro";
+import InfoIcon from "@components/resources/icons/InfoIcon.astro";
+import ArrowRIcon from "@components/resources/icons/ArrowRIcon.astro";
+
+let { title = "Todos los productos" } = Astro.props;
+---
+
+<Layout title="Productos | FireWorks">
+  <section class="grid md:grid-cols-3 gap-6 p-2 mb-4">
+    <article
+      id="categoriesNav"
+      class="h-16 md:h-fit overflow-hidden bg-secondary/60 dark:bg-rose-200/80 dark:text-gray-800 px-4 md:px-6 py-4 rounded-lg flex flex-col gap-2 shadow"
+    >
+      <button
+        id="showcategoriesNav"
+        class="font-bold text-xl flex items-center justify-between cursor-pointer"
+        >Categorias: <span
+          id="arrowMenuNav"
+          class="rotate-90 transition text-red-700 inline-block"
+        >
+          <ArrowRIcon className="size-8 md:rotate-180" />
+        </span></button
+      >
+      <div class="flex flex-col mt-1 gap-2 *:inline-flex">
+        <button class="cursor-pointer" id="allProducts">
+          <span class="text-red-700"><ArrowR /></span> Todos los productos
+        </button>
+        <div
+          id="categories-list"
+          class="flex flex-col gap-2 *:inline-flex *:gap-1"
+        >
+          {
+            Array(6)
+              .fill(0)
+              .map((_, index) => (
+                <div class="animate-pulse loader block w-full h-6 rounded-lg bg-gray-200 dark:bg-gray-300" />
+              ))
+          }
+        </div>
+      </div>
+    </article>
+    <article
+      class="w-full md:col-span-2 gap-4 grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
+    >
+      <div
+        class="col-span-full h-fit w-full text-pretty p-4 text-sm bg-secondary/60 dark:bg-rose-200/80 dark:text-gray-800 rounded-lg flex justify-between items-center gap-4 shadow"
+      >
+        <p>
+          Agrega cualquier producto a tu pedido dando un click en el <HeartIcon
+            className="text-red-700 inline-block size-4 mb-1"
+          />. <br /> Despues podes editar cantidades, antes de enviarnos <a
+            href="/pedido"
+            class="text-red-700">tu pedido.</a
+          >
+        </p>
+        <InfoIcon className="text-red-700 size-7" />
+      </div>
+      <h2
+        class="col-span-full font-bold text-xl w-full dark:text-secondary first-letter:uppercase"
+        id="title-categories"
+      >
+        {title}
+      </h2>
+
+      <!-- Se cargaran los productos -->
+
+      <div
+        id="products-list"
+        class="col-span-full gap-4 shadow grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
+      >
+        {
+          Array(12)
+            .fill(0)
+            .map((_, index) => (
+              <div class="animate-pulse loader block w-full h-70 rounded-lg bg-secondary/60 dark:bg-rose-200/80 dark:text-gray-800" />
+            ))
+        }
+      </div>
+    </article>
+  </section>
+</Layout>
+
+<style>
+  :root {
+    interpolate-size: allow-keywords;
+  }
+  #categoriesNav {
+    transition: height 0.3s ease-out;
+  }
+</style>
+
+<script>
+  function closeMenuCategorias() {
+    const categoriesNav = document.querySelector("#categoriesNav");
+    const arrowMenuNav = document.querySelector("#arrowMenuNav");
+
+    if (document.querySelector("#showcategoriesNav")) {
+      document
+        .querySelector("#showcategoriesNav")
+        ?.addEventListener("click", (e) => {
+          categoriesNav?.classList.toggle("h-16");
+          categoriesNav?.classList.toggle("md:h-16");
+          categoriesNav?.classList.toggle("md:h-fit");
+          arrowMenuNav?.classList.toggle("-rotate-90");
+          arrowMenuNav?.classList.toggle("rotate-90");
+        });
+    }
+  }
+
+  // Ejecuta la función cuando se carga la página
+  document.addEventListener("astro:page-load", closeMenuCategorias);
+</script>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const urlApi = "https://admin.bonnitaglammakeup.com.ar";
+    const categoriesList = document.querySelector("#categories-list");
+    const titleCategories = document.querySelector("#title-categories");
+    const productsList = document.querySelector("#products-list");
+    const allProducts = document.querySelector("#allProducts");
+
+    //Solo para hacer el slug:
+    function convertirAStringAmigable(texto: string) {
+      let stringAmigable = texto.toLowerCase().replace(/[^a-z0-9\s]/g, "");
+      stringAmigable = stringAmigable.replace(/\s+/g, "-");
+      stringAmigable = stringAmigable.replace(/-+/g, "-");
+      stringAmigable = stringAmigable.replace(/^-+|-+$/g, "");
+
+      return stringAmigable;
+    }
+
+    function getProductsByCategory(slug: any) {
+      //Trae los productos de una categoria
+      let nombre = slug.replace(/-/g, " ");
+      if (titleCategories) {
+        titleCategories.innerHTML = nombre;
+      }
+
+      fetch(`${urlApi}/api/products?category_slug=${slug}`) //Obtengo los productos de la categoria
+        .then((response) => response.json())
+        .then((data) => {
+          const products = data.data;
+          if (productsList) {
+            productsList.innerHTML = "";
+          }
+
+          if (products.length === 0) {
+            if (productsList) {
+            productsList.innerHTML = `<p class="text-red-700 font-semibold grid place-content-center text-xl col-span-full text-center p-3 bg-secondary/60 dark:bg-rose-200/80 dark:text-gray-800 shadow rounded-lg">
+        ¡Lo siento, no hay ningun producto en esta categoria!
+      </p>`;
+          }
+          return;
+          }
+
+          products.forEach((product: any) => {
+            const productCard = document.createElement("div");
+            productCard.classList.add("product-card");
+            productCard.innerHTML = `<article
+                                    title=${product.name}
+                                    data-image=${urlApi}/storage_public/${product.urlImage}
+                                    data-price=${product.price}
+                                    data-sku=${product.sku}
+                                    class="productCard bg-secondary/60 dark:bg-rose-200/80 dark:text-gray-800 rounded-lg py-4 px-4 flex flex-col gap-1 items-center shadow"
+                                  >
+                                    <header
+                                      class="flex w-full justify-between self-start"
+                                    >
+                                      <span class="font-semibold text-ellipsis line-clamp-1 text-nowrap text-lg">${product.name}</span> <span class="text-sm opacity-50"> ${product.sku} </span>
+                                    </header>
+                                    <main class="flex md:flex-col items-center gap-3 md:gap-1">
+                                      <img
+                                        class="w-full aspect-square max-w-24 md:max-w-32 dark:bg-neutral-200 rounded-lg"
+                                        src=${urlApi}/storage_public/${product.urlImage}
+                                        alt=${product.name}
+                                      />
+                                      <p
+                                        class="p-1 md:p-0 text-sm text-pretty text-ellipsis line-clamp-5 md:line-clamp-4"
+                                      >
+                                        ${product.description}
+                                      </p>
+                                    </main>
+                                    <footer class="flex w-full justify-between pt-1">
+                                      <span class="precio font-bold text-lg">${product.price}</span>
+                                      <button
+                                        title="Agregar al pedido"
+                                        class="btnAddToWishList bg-red-700 text-secondary cursor-pointer p-1 rounded hover:-translate-y-0.5 transition"
+                                      >
+                                        <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class='size-6'
+                                    viewBox="0 0 24 24"
+                                    style="fill: currentColor;transform: ;msFilter:;"
+                                    ><path
+                                      d="M20.205 4.791a5.938 5.938 0 0 0-4.209-1.754A5.906 5.906 0 0 0 12 4.595a5.904 5.904 0 0 0-3.996-1.558 5.942 5.942 0 0 0-4.213 1.758c-2.353 2.363-2.352 6.059.002 8.412L12 21.414l8.207-8.207c2.354-2.353 2.355-6.049-.002-8.416z"
+                                    ></path></svg
+                                  >
+                                      </button>
+                                    </footer>
+                                  </article>`;
+            productsList?.appendChild(productCard);
+          });
+        })
+        .catch((error) => {
+          console.error("Error al obtener los productos:", error);
+        });
+    }
+
+    function getProducts() {
+      //Trae todos los productos por defecto
+      fetch(`${urlApi}/api/products`)
+        .then((response) => response.json())
+        .then((data) => {
+          const products = data.data;
+          if (productsList) {
+            productsList.innerHTML = "";
+          }
+
+          if (products.length === 0) {
+            if (productsList) {
+            productsList.innerHTML = `<p class="text-red-700 font-semibold grid place-content-center text-xl col-span-full text-center p-3 bg-secondary/60 dark:bg-rose-200/80 dark:text-gray-800 shadow rounded-lg">
+        ¡Lo siento, no hay ningun producto en esta categoria!
+      </p>`;
+          }
+          return;
+          }
+
+          products.forEach((product: any) => {
+            const productCard = document.createElement("div");
+            productCard.classList.add("product-card");
+            productCard.innerHTML = `<article
+                                        title=${product.name}
+                                        data-image=${urlApi}/storage_public/${product.urlImage}
+                                        data-price=${product.price}
+                                        data-sku=${product.sku}
+                                        class="productCard bg-secondary/60 dark:bg-rose-200/80 dark:text-gray-800 rounded-lg py-4 px-4 flex flex-col gap-1 items-center shadow"
+                                      >
+                                        <header
+                                          class="flex w-full justify-between self-start"
+                                        >
+                                          <span class="font-semibold text-ellipsis line-clamp-1 text-nowrap text-lg">${product.name}</span> <span class="text-sm opacity-50"> ${product.sku} </span>
+                                        </header>
+                                        <main class="flex md:flex-col items-center gap-3 md:gap-1">
+                                          <img
+                                            class="w-full aspect-square max-w-24 md:max-w-32 dark:bg-neutral-200 rounded-lg"
+                                            src=${urlApi}/storage_public/${product.urlImage}
+                                            alt=${product.name}
+                                          />
+                                          <p
+                                            class="p-1 md:p-0 text-sm text-pretty text-ellipsis line-clamp-5 md:line-clamp-4"
+                                          >
+                                            ${product.description}
+                                          </p>
+                                        </main>
+                                        <footer class="flex w-full justify-between pt-1">
+                                          <span class="precio font-bold text-lg">${product.price}</span>
+                                          <button
+                                            title="Agregar al pedido"
+                                            class="btnAddToWishList bg-red-700 text-secondary cursor-pointer p-1 rounded hover:-translate-y-0.5 transition"
+                                          >
+                                            <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        class='size-6'
+                                        viewBox="0 0 24 24"
+                                        style="fill: currentColor;transform: ;msFilter:;"
+                                        ><path
+                                          d="M20.205 4.791a5.938 5.938 0 0 0-4.209-1.754A5.906 5.906 0 0 0 12 4.595a5.904 5.904 0 0 0-3.996-1.558 5.942 5.942 0 0 0-4.213 1.758c-2.353 2.363-2.352 6.059.002 8.412L12 21.414l8.207-8.207c2.354-2.353 2.355-6.049-.002-8.416z"
+                                        ></path></svg
+                                      >
+                                          </button>
+                                        </footer>
+                                      </article>`;
+            productsList?.appendChild(productCard);
+          });
+
+        })
+        .catch((error) => {
+          console.error("Error al obtener los productos:", error);
+        });
+    }
+
+    //Consigo la lista de categorias, la muestro en el menu
+    fetch(`${urlApi}/api/categories`)
+      .then((response) => response.json())
+      .then((data) => {
+        const categories = data.data;
+        if (categoriesList) {
+          categoriesList.innerHTML = "";
+        }
+        categories.forEach((category: any) => {
+          const slug = convertirAStringAmigable(category.name);
+          const item = document.createElement("button");
+          item.classList.add("cursor-pointer");
+          item.name = slug;
+          item.addEventListener("click", (e) => {
+            getProductsByCategory(slug); //Al dar click en una categoria, se muestra la lista de productos
+          });
+          item.innerHTML = `
+            <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  class="size-5 text-red-700 inline-block"
+                  style="fill: currentColor;transform: ;msFilter:;"
+                  ><path
+                    d="M10.707 17.707 16.414 12l-5.707-5.707-1.414 1.414L13.586 12l-4.293 4.293z"
+                  ></path></svg
+                  > ${category.name}
+          `;
+          categoriesList?.appendChild(item);
+        });
+      })
+      .catch((error) => {
+        console.error("Error al obtener las categorías:", error);
+      });
+
+    //Al dar click en el botón "Todos los productos", se muestra la lista de productos por defecto
+    allProducts?.addEventListener("click", (e) => {
+      if (titleCategories) {
+        titleCategories.innerHTML = "Todos los productos";
+      }
+      getProducts();
+    });
+
+    //Si la url tiene un slug, se muestra la lista de productos de esa categoria
+    const url = new URL(window.location.href);
+    const slug = url.searchParams.get("category_slug");
+    if (slug) {
+      getProductsByCategory(slug);
+    } else {
+      getProducts();
+    }
+  });
+</script>
