@@ -69,7 +69,7 @@ let { title = "Todos los productos" } = Astro.props;
 
       <div
         id="products-list"
-        class="col-span-full gap-4 shadow grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
+        class="col-span-full gap-4 grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
       >
         {
           Array(12)
@@ -132,6 +132,25 @@ let { title = "Todos los productos" } = Astro.props;
       return stringAmigable;
     }
 
+    const localWishList = getWishList();
+
+    function getWishList() {
+      //Si es la primera vez y no existe la lista de deseos, la creo
+      //@ts-ignore
+      let WishList = JSON.parse(localStorage.getItem("wishListBonitaGlam")) || [];
+      if (WishList.length === 0) {
+        localStorage.setItem("wishListBonitaGlam", JSON.stringify([])); //Comprueba si ya existe o no, y la crea
+      }
+      return WishList;
+    }
+
+    //console.log(localWishList);
+
+    //Funcion para agregar un producto a la lista
+    function setWishList() {
+      localStorage.setItem("wishListBonitaGlam", JSON.stringify(localWishList));
+    }
+
     function getProductsByCategory(slug: any) {
       //Trae los productos de una categoria
       let nombre = slug.replace(/-/g, " ");
@@ -149,58 +168,15 @@ let { title = "Todos los productos" } = Astro.props;
 
           if (products.length === 0) {
             if (productsList) {
-            productsList.innerHTML = `<p class="text-red-700 font-semibold grid place-content-center text-xl col-span-full text-center p-3 bg-secondary/60 dark:bg-rose-200/80 dark:text-gray-800 shadow rounded-lg">
+              productsList.innerHTML = `<p class="text-red-700 font-semibold grid place-content-center text-xl col-span-full text-center p-3 bg-secondary/60 dark:bg-rose-200/80 dark:text-gray-800 shadow rounded-lg">
         ¡Lo siento, no hay ningun producto en esta categoria!
       </p>`;
-          }
-          return;
+            }
+            return;
           }
 
           products.forEach((product: any) => {
-            const productCard = document.createElement("div");
-            productCard.classList.add("product-card");
-            productCard.innerHTML = `<article
-                                    title=${product.name}
-                                    data-image=${urlApi}/storage_public/${product.urlImage}
-                                    data-price=${product.price}
-                                    data-sku=${product.sku}
-                                    class="productCard bg-secondary/60 dark:bg-rose-200/80 dark:text-gray-800 rounded-lg py-4 px-4 flex flex-col gap-1 items-center shadow"
-                                  >
-                                    <header
-                                      class="flex w-full justify-between self-start"
-                                    >
-                                      <span class="font-semibold text-ellipsis line-clamp-1 text-nowrap text-lg">${product.name}</span> <span class="text-sm opacity-50"> ${product.sku} </span>
-                                    </header>
-                                    <main class="flex md:flex-col items-center gap-3 md:gap-1">
-                                      <img
-                                        class="w-full aspect-square max-w-24 md:max-w-32 dark:bg-neutral-200 rounded-lg"
-                                        src=${urlApi}/storage_public/${product.urlImage}
-                                        alt=${product.name}
-                                      />
-                                      <p
-                                        class="p-1 md:p-0 text-sm text-pretty text-ellipsis line-clamp-5 md:line-clamp-4"
-                                      >
-                                        ${product.description}
-                                      </p>
-                                    </main>
-                                    <footer class="flex w-full justify-between pt-1">
-                                      <span class="precio font-bold text-lg">${product.price}</span>
-                                      <button
-                                        title="Agregar al pedido"
-                                        class="btnAddToWishList bg-red-700 text-secondary cursor-pointer p-1 rounded hover:-translate-y-0.5 transition"
-                                      >
-                                        <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    class='size-6'
-                                    viewBox="0 0 24 24"
-                                    style="fill: currentColor;transform: ;msFilter:;"
-                                    ><path
-                                      d="M20.205 4.791a5.938 5.938 0 0 0-4.209-1.754A5.906 5.906 0 0 0 12 4.595a5.904 5.904 0 0 0-3.996-1.558 5.942 5.942 0 0 0-4.213 1.758c-2.353 2.363-2.352 6.059.002 8.412L12 21.414l8.207-8.207c2.354-2.353 2.355-6.049-.002-8.416z"
-                                    ></path></svg
-                                  >
-                                      </button>
-                                    </footer>
-                                  </article>`;
+            let productCard = createProductCard(product);
             productsList?.appendChild(productCard);
           });
         })
@@ -221,65 +197,255 @@ let { title = "Todos los productos" } = Astro.props;
 
           if (products.length === 0) {
             if (productsList) {
-            productsList.innerHTML = `<p class="text-red-700 font-semibold grid place-content-center text-xl col-span-full text-center p-3 bg-secondary/60 dark:bg-rose-200/80 dark:text-gray-800 shadow rounded-lg">
+              productsList.innerHTML = `<p class="text-red-700 font-semibold grid place-content-center text-xl col-span-full text-center p-3 bg-secondary/60 dark:bg-rose-200/80 dark:text-gray-800 shadow rounded-lg">
         ¡Lo siento, no hay ningun producto en esta categoria!
       </p>`;
-          }
-          return;
+            }
+            return;
           }
 
           products.forEach((product: any) => {
-            const productCard = document.createElement("div");
-            productCard.classList.add("product-card");
-            productCard.innerHTML = `<article
-                                        title=${product.name}
-                                        data-image=${urlApi}/storage_public/${product.urlImage}
-                                        data-price=${product.price}
-                                        data-sku=${product.sku}
-                                        class="productCard bg-secondary/60 dark:bg-rose-200/80 dark:text-gray-800 rounded-lg py-4 px-4 flex flex-col gap-1 items-center shadow"
-                                      >
-                                        <header
-                                          class="flex w-full justify-between self-start"
-                                        >
-                                          <span class="font-semibold text-ellipsis line-clamp-1 text-nowrap text-lg">${product.name}</span> <span class="text-sm opacity-50"> ${product.sku} </span>
-                                        </header>
-                                        <main class="flex md:flex-col items-center gap-3 md:gap-1">
-                                          <img
-                                            class="w-full aspect-square max-w-24 md:max-w-32 dark:bg-neutral-200 rounded-lg"
-                                            src=${urlApi}/storage_public/${product.urlImage}
-                                            alt=${product.name}
-                                          />
-                                          <p
-                                            class="p-1 md:p-0 text-sm text-pretty text-ellipsis line-clamp-5 md:line-clamp-4"
-                                          >
-                                            ${product.description}
-                                          </p>
-                                        </main>
-                                        <footer class="flex w-full justify-between pt-1">
-                                          <span class="precio font-bold text-lg">${product.price}</span>
-                                          <button
-                                            title="Agregar al pedido"
-                                            class="btnAddToWishList bg-red-700 text-secondary cursor-pointer p-1 rounded hover:-translate-y-0.5 transition"
-                                          >
-                                            <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        class='size-6'
-                                        viewBox="0 0 24 24"
-                                        style="fill: currentColor;transform: ;msFilter:;"
-                                        ><path
-                                          d="M20.205 4.791a5.938 5.938 0 0 0-4.209-1.754A5.906 5.906 0 0 0 12 4.595a5.904 5.904 0 0 0-3.996-1.558 5.942 5.942 0 0 0-4.213 1.758c-2.353 2.363-2.352 6.059.002 8.412L12 21.414l8.207-8.207c2.354-2.353 2.355-6.049-.002-8.416z"
-                                        ></path></svg
-                                      >
-                                          </button>
-                                        </footer>
-                                      </article>`;
+            let productCard = createProductCard(product);
             productsList?.appendChild(productCard);
           });
-
         })
         .catch((error) => {
           console.error("Error al obtener los productos:", error);
         });
+    }
+
+    function createProductCard(product: any) {
+      const productCard = document.createElement("div");
+      productCard.classList.add("product-card");
+      const article = document.createElement("article");
+      article.className =
+        "productCard h-full justify-between bg-secondary/60 dark:bg-rose-200/80 dark:text-gray-800 rounded-lg py-4 px-4 flex flex-col gap-1 items-center shadow";
+      article.title = product.name;
+      article.dataset.image = `${urlApi}/storage_public/${product.urlImage}`;
+      article.dataset.price = product.price;
+      article.dataset.sku = product.sku;
+      article.dataset.maxQuantity = product.quantity;
+
+      const quantity = product.quantity;
+
+      // Header
+      const header = document.createElement("header");
+      header.className = "flex w-full justify-between self-start";
+
+      const nameSpan = document.createElement("span");
+      nameSpan.className =
+        "font-semibold text-ellipsis line-clamp-1 text-nowrap text-lg";
+      nameSpan.textContent = product.name;
+
+      const skuSpan = document.createElement("span");
+      skuSpan.className = "text-sm opacity-50";
+      skuSpan.textContent = product.sku;
+
+      header.appendChild(nameSpan);
+      header.appendChild(skuSpan);
+
+      // Main
+      const main = document.createElement("main");
+      main.className = "flex md:flex-col items-center gap-3 md:gap-1";
+
+      const img = document.createElement("img");
+      img.className =
+        "w-full aspect-square max-w-24 md:max-w-32 dark:bg-neutral-200 rounded-lg";
+      img.src = `${urlApi}/storage_public/${product.urlImage}`;
+      img.alt = product.name;
+
+      const description = document.createElement("p");
+      description.className =
+        "p-1 md:p-0 text-sm text-pretty text-ellipsis line-clamp-5 md:line-clamp-4";
+      description.textContent = product.description;
+
+      main.appendChild(img);
+      main.appendChild(description);
+
+      // Footer
+      const footer = document.createElement("footer");
+      footer.className = "flex w-full justify-between pt-1 items-center";
+
+      const price = document.createElement("span");
+      price.className = "precio font-bold text-lg";
+      price.textContent = `$${product.price}`;
+
+      // Botón (agregar al pedido)
+      const button = document.createElement("button");
+      button.className =
+        "btnAddToWishList bg-red-700 text-secondary cursor-pointer p-1 rounded hover:-translate-y-0.5 transition";
+      button.title = "Agregar al pedido";
+      button.addEventListener("click", (e) => {
+        console.log("click");
+        //@ts-ignore
+        const card = e.target.closest(".productCard");
+
+        let item = {
+          title: card.getAttribute("title"),
+          image: card.getAttribute("data-image"),
+          price: card.getAttribute("data-price"),
+          sku: card.getAttribute("data-sku"),
+          color: card.getAttribute("data-color"),
+          colorName: card.getAttribute("data-color-name"),
+          quantity: 1,
+        };
+
+        const existItem = localWishList.find(
+          (itemList: any) => itemList.title == item.title
+        ); //busca si ya existe algun item con el mismo nombre en la lista de deseos
+
+        if (existItem) {
+          if (existItem.quantity < quantity) {
+            existItem.quantity++;
+            // Enviar el evento a nivel de `window`
+            setWishList();
+            window.dispatchEvent(
+              new CustomEvent("user:addedProduct", {
+                detail: "Se agregó uno más al pedido. 😀",
+              })
+            );
+          } else {
+            window.dispatchEvent(
+              new CustomEvent("user:addedProduct", {
+                detail: "Solo tenemos " + quantity + " unidades de " + item.title + ". 😢",
+              })
+            );
+          }
+          //console.log("Aumentada la cantidad de " + item.title);
+        } else {
+          localWishList.push(item);
+          //console.log("Añadido " + item.title);
+          // Enviar el evento a nivel de `window`
+          setWishList();
+          window.dispatchEvent(
+            new CustomEvent("user:addedProduct", {
+              detail: item.title + " añadido al pedido. 🎉",
+            })
+          );
+        }
+      });
+
+      // SVG (corazón)
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+      svg.setAttribute("viewBox", "0 0 24 24");
+      svg.setAttribute("class", "size-6");
+      svg.setAttribute("style", "fill: currentColor;transform: ;msFilter:;");
+
+      const path = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "path"
+      );
+      path.setAttribute(
+        "d",
+        "M20.205 4.791a5.938 5.938 0 0 0-4.209-1.754A5.906 5.906 0 0 0 12 4.595a5.904 5.904 0 0 0-3.996-1.558 5.942 5.942 0 0 0-4.213 1.758c-2.353 2.363-2.352 6.059.002 8.412L12 21.414l8.207-8.207c2.354-2.353 2.355-6.049-.002-8.416z"
+      );
+
+      svg.appendChild(path);
+      button.appendChild(svg);
+      footer.appendChild(price);
+      footer.appendChild(button);
+
+      // Ensamblado final
+      article.appendChild(header);
+      article.appendChild(main);
+
+      if (product.colors && product.colors.length > 0) {
+        const colorContainer = document.createElement("div");
+        article.dataset.color = product.colors[0].hex_code;
+        article.dataset.colorName = product.colors[0].name;
+        colorContainer.className = "relative w-full mt-2";
+
+        // Estado: color seleccionado (por defecto el primero)
+        let selectedColor = product.colors[0];
+
+        // Botón (preview actual)
+        const dropdownBtn = document.createElement("button");
+        dropdownBtn.type = "button";
+        dropdownBtn.className = `
+    flex items-center justify-between w-full py-2 rounded cursor-pointer hover:text-primary
+  `;
+
+        const colorCircle = document.createElement("span");
+        colorCircle.className =
+          "inline-block size-8 rounded hover:-translate-y-0.5 transition";
+        colorCircle.style.backgroundColor = selectedColor.hex_code;
+
+        const colorLabel = document.createElement("span");
+        colorLabel.className = `font-bold`;
+        colorLabel.textContent = selectedColor.name;
+
+        dropdownBtn.appendChild(colorLabel);
+        dropdownBtn.appendChild(colorCircle);
+
+        // Dropdown (lista de opciones)
+        const dropdownList = document.createElement("ul");
+        dropdownList.className = `
+    absolute z-10 w-full mt-1 bg-secondary border rounded shadow
+    max-h-40 overflow-y-auto hidden
+  `;
+
+        product.colors.forEach((color: any) => {
+          const item = document.createElement("li");
+          item.className = `
+      flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-gray-200
+    `;
+
+          const itemCircle = document.createElement("span");
+          itemCircle.className = "inline-block size-8 rounded";
+          itemCircle.style.backgroundColor = color.hex_code;
+
+          const itemLabel = document.createElement("span");
+          itemLabel.textContent = color.name;
+
+          item.appendChild(itemLabel);
+          item.appendChild(itemCircle);
+
+          // Seleccionar color al hacer click
+          item.addEventListener("click", () => {
+            selectedColor = color;
+
+            // Actualizar preview
+            colorCircle.style.backgroundColor = color.hex_code;
+            colorLabel.textContent = color.name;
+
+            // Actualizar dataset del artículo
+            article.dataset.color = color.hex_code;
+            article.dataset.colorName = color.name;
+
+            // Cerrar el dropdown
+            dropdownList.classList.add("hidden");
+
+            console.log("Color seleccionado:", color.name, color.hex_code);
+          });
+
+          dropdownList.appendChild(item);
+        });
+
+        // Toggle del dropdown
+        dropdownBtn.addEventListener("click", (e) => {
+          e.stopPropagation(); // Evitar que se cierre inmediatamente
+          dropdownList.classList.toggle("hidden");
+        });
+
+        // Cerrar el dropdown si se hace click fuera
+        document.addEventListener("click", () => {
+          dropdownList.classList.add("hidden");
+        });
+
+        // Ensamblar
+        colorContainer.appendChild(dropdownBtn);
+        colorContainer.appendChild(dropdownList);
+        article.appendChild(colorContainer);
+      }
+
+      article.appendChild(footer);
+
+      // Añadir al contenedor
+      productCard.innerHTML = ""; // si quieres limpiar primero
+      productCard.appendChild(article);
+
+      return productCard;
     }
 
     //Consigo la lista de categorias, la muestro en el menu
