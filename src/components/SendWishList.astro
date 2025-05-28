@@ -3,36 +3,37 @@ import CopyIcon from "./resources/icons/CopyIcon.astro";
 import EmailIcon from "./resources/icons/EmailIcon.astro";
 import WhatsAppIcon from "./resources/icons/WhatsAppIcon.astro";
 import DownloadIcon from "@components/resources/icons/DownloadIcon.astro";
+import { contact } from "./Footer.astro";
 ---
 
 <header
-  class="flex gap-2 w-full justify-between items-center border-b pb-2 dark:border-neutral-600"
+  class="flex gap-2 w-full justify-between items-center border-b pb-2 border-neutral-200"
 >
   <h3 class="font-bold">Enviar</h3>
 
   <div class="flex items-center *:rounded text-white gap-2">
     <button
+      id="btnCopy"
+      class="p-1 hover:-translate-y-0.5 transition bg-primary cursor-pointer"
+      title="Copiar"><CopyIcon /></button
+    >
+    <button
       id="btnDownload"
-      class="p-1 hover:-translate-y-0.5 transition bg-indigo-500"
+      class="p-1 hover:-translate-y-0.5 transition bg-indigo-500 cursor-pointer"
       title="Descargar Imagen"
       ><DownloadIcon />
     </button>
-    <button
-      id="btnCopy"
-      class="p-1 hover:-translate-y-0.5 transition bg-orange-500"
-      title="Copiar"><CopyIcon /></button
-    >
     <a
-      href="#"
+      href=`${contact.email}`
       id="btnEmail"
-      class="p-1 hover:-translate-y-0.5 transition bg-blue-500"
+      class="p-1 hover:-translate-y-0.5 transition bg-cyan-500 cursor-pointer"
       title="Enviar por Mail"><EmailIcon /></a
     >
     <a
-      href="#"
+      href=`${contact.phone}`
       id="btnWsp"
       target="_blank"
-      class="p-1 hover:-translate-y-0.5 transition bg-green-500"
+      class="p-1 hover:-translate-y-0.5 transition bg-green-500 cursor-pointer"
       title="Enviar por WhatsApp"><WhatsAppIcon /></a
     >
   </div>
@@ -57,7 +58,7 @@ import DownloadIcon from "@components/resources/icons/DownloadIcon.astro";
   </div>
 
   <div
-    class="border-t dark:border-neutral-600 flex justify-between w-full mt-1 py-2 font-bold"
+    class="border-t border-neutral-200 flex justify-between w-full mt-1 py-2 font-bold"
   >
     <h3 class="">Total:</h3>
     <span
@@ -78,7 +79,8 @@ import DownloadIcon from "@components/resources/icons/DownloadIcon.astro";
 
   function getWishList() {
     //Si es la primera vez y no existe la lista de deseos, la creo
-    let WishList = JSON.parse(localStorage.getItem("wishList")) || [];
+    //@ts-ignore
+    let WishList = JSON.parse(localStorage.getItem("wishListBonitaGlam")) || [];
     if (WishList.length === 0) {
       localStorage.setItem("wishList", JSON.stringify([])); //Comprueba si ya existe o no, y la crea
     }
@@ -96,7 +98,7 @@ import DownloadIcon from "@components/resources/icons/DownloadIcon.astro";
       } else {
         sendWishList.innerHTML = ""; //Reseteo la lista
 
-        localWishList.forEach((item) => {
+        localWishList.forEach((item: any) => {
           let cant = document.createElement("span");
           cant.classList.add("text-center");
           cant.textContent = item.quantity;
@@ -119,7 +121,7 @@ import DownloadIcon from "@components/resources/icons/DownloadIcon.astro";
 
       //Suma total
       let sum = 0;
-      localWishList.forEach((item) => {
+      localWishList.forEach((item: any) => {
         sum = sum + Number(item.quantity * item.price);
       });
       //@ts-ignore
@@ -129,22 +131,21 @@ import DownloadIcon from "@components/resources/icons/DownloadIcon.astro";
       setBtnWsp();
       setBtnEmail();
       // Asigna la función al evento de clic del botón
-      document
-        .querySelector("#btnCopy")
-        .addEventListener("click", copyListToClipboard);
+      document?.querySelector("#btnCopy")?.addEventListener("click", copyListToClipboard);
     }
   }
 
   function setBtnWsp() {
+
     const productos = getWishList();
-    const numeroTelefono = "543875459077";
     const btnWsp = document.querySelector("#btnWsp");
+    const numeroTelefono = btnWsp?.getAttribute("href");
 
     // Formatea los datos en un mensaje de texto
     let mensaje = "Mi lista:\n\n";
     let total = 0;
 
-    productos.forEach((producto, index) => {
+    productos.forEach((producto: any, index: number) => {
       mensaje += `${index + 1}. ${producto.title}\n`;
       mensaje += `      Cantidad: ${producto.quantity}\n`;
       mensaje += `      Precio: $${producto.price * producto.quantity}\n`;
@@ -161,19 +162,20 @@ import DownloadIcon from "@components/resources/icons/DownloadIcon.astro";
     // Crea la URL de WhatsApp
     const urlWhatsApp = `https://api.whatsapp.com/send/?phone=${numeroTelefono}&text=${mensajeCodificado}`;
 
-    btnWsp.setAttribute("href", urlWhatsApp);
+    btnWsp?.setAttribute("href", urlWhatsApp);
   }
 
   function setBtnEmail() {
     const productos = getWishList();
-    const email = "leytoncristian96@gmail.com";
     const btnEmail = document.querySelector("#btnEmail");
+    const email = btnEmail?.getAttribute("href");
+  
 
     // Formatea los datos en un mensaje de texto
     let mensaje = "Mi lista:\n\n";
     let total = 0;
 
-    productos.forEach((producto, index) => {
+    productos.forEach((producto: any, index: number) => {
       mensaje += `${index + 1}. ${producto.title}\n`;
       mensaje += `      Cantidad: ${producto.quantity}\n`;
       mensaje += `      Precio: $${producto.price * producto.quantity}\n`;
@@ -193,7 +195,7 @@ import DownloadIcon from "@components/resources/icons/DownloadIcon.astro";
     // Crea la URL de mailto
     const urlEmail = `mailto:${email}?subject=${asunto}&body=${mensajeCodificado}`;
 
-    btnEmail.setAttribute("href", urlEmail);
+    btnEmail?.setAttribute("href", urlEmail);
   }
 
   function copyListToClipboard() {
@@ -203,7 +205,7 @@ import DownloadIcon from "@components/resources/icons/DownloadIcon.astro";
     let mensaje = "Mi lista:\n\n";
     let total = 0;
 
-    productos.forEach((producto, index) => {
+    productos.forEach((producto: any, index: number) => {
       mensaje += `${index + 1}. ${producto.title}\n`;
       mensaje += `      Cantidad: ${producto.quantity}\n`;
       mensaje += `      Precio: $${producto.price * producto.quantity}\n`;

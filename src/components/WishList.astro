@@ -4,7 +4,7 @@ import StoreIcon from "./resources/icons/StoreIcon.astro";
 ---
 
 <header
-  class="flex items-center w-full justify-between border-b dark:border-neutral-600 pb-2"
+  class="flex items-center w-full justify-between border-b border-neutral-200 pb-2"
 >
   <h3 class="font-bold">Editar lista</h3>
 
@@ -12,30 +12,31 @@ import StoreIcon from "./resources/icons/StoreIcon.astro";
     <button
       id="cleanList"
       title="Eliminar todo"
-      class="bg-red-500 text-white inline-flex items-center font-semibold text-sm gap-1.5 px-2 py-1.5 rounded flex-nowrap text-nowrap transition hover:-translate-y-0.5"
+      class="bg-rose-200 text-primary inline-flex items-center font-semibold text-sm gap-1.5 px-2 py-1.5 rounded flex-nowrap text-nowrap transition hover:-translate-y-0.5 cursor-pointer"
       >Vaciar lista <DeleteIcon className="inline-block" /></button
     >
     <a
-      href="/categories"
+      href="/productos"
       title="Ver más productos"
-      class="bg-orange-500 text-white inline-flex flex-nowrap items-center text-nowrap font-semibold text-sm gap-1.5 px-2 py-1.5 rounded transition hover:-translate-y-0.5"
+      class="bg-primary text-secondary inline-flex flex-nowrap items-center text-nowrap font-semibold text-sm gap-1.5 px-2 py-1.5 rounded transition hover:-translate-y-0.5"
     >
-      Agregar
+      Ver más
       <StoreIcon />
     </a>
   </div>
 </header>
 <main id="wishList" class=""></main>
 <!-- Modal para eliminar todos los items de la lista -->
+
 <dialog
   id="deleteListModal"
-  class="backdrop:bg-neutral-700/30 dark:backdrop:bg-neutral-950/60 rounded-xl overflow-hidden bg-red-500"
+  class="backdrop:bg-neutral-700/30 dark:backdrop:bg-neutral-950/60 rounded-xl overflow-hidden mx-auto"
 >
-  <div class="bg-yellow-50 dark:bg-neutral-600 p-4">
+  <div class="bg-secondary dark:bg-rose-200 p-4">
     <header
-      class="dark:text-white flex flex-col gap-3 w-full justify-center items-center"
+      class=" flex flex-col gap-3 w-full justify-center items-center"
     >
-      <i class="text-red-500 rounded-full"
+      <i class="text-primary rounded-full"
         ><svg
           class="bg-white rounded-full pb-1.5 size-14"
           xmlns="http://www.w3.org/2000/svg"
@@ -49,56 +50,24 @@ import StoreIcon from "./resources/icons/StoreIcon.astro";
         ></i
       > ¿Eliminar por completo la lista?
     </header>
-    <p class="font-semibold dark:text-white">
-      ¿Estás seguro? <span class="text-red-500">
+    <p class="font-semibold ">
+      ¿Estás seguro? <span class="text-primary">
         ¡Esta acción no se puede revertir!</span
       >
     </p>
   </div>
   <footer
-    class="flex justify-end items-center bg-orange-200 dark:bg-neutral-700 gap-2 px-4 py-2"
+    class="flex justify-end items-center bg-primary/20 dark:bg-primary/40 gap-2 px-4 py-2"
   >
-    <button id="btnDeleteList" class="px-3 py-1 bg-red-500 rounded text-white"
+    <button id="btnDeleteList" class="px-3 py-1 bg-primary rounded text-white cursor-pointer"
       >Eliminar</button
     >
     <button
       id="closeModalDeleteList"
-      class="px-3 py-1 bg-yellow-50 dark:bg-white rounded">Cerrar</button
+      class="px-3 py-1 bg-secondary rounded cursor-pointer">Cerrar</button
     >
   </footer>
 </dialog>
-
-<style is:global>
-  @tailwind base;
-  @tailwind components;
-  @tailwind utilities;
-
-  @layer components {
-    .wish-item {
-      @apply grid grid-rows-2 grid-cols-4 gap-x-4 xl:gap-x-7 items-end lg:grid-rows-1 lg:items-center dark:border-neutral-600 border-b pt-2 pb-4 lg:grid-cols-8;
-    }
-    .wish-item img {
-      @apply w-full aspect-square max-w-24 row-span-2 place-self-center dark:bg-neutral-200 dark:rounded-lg;
-    }
-    .wish-item h5 {
-      @apply col-span-3 lg:col-span-4 lg:pl-6 line-clamp-2 text-ellipsis;
-    }
-    .quantity-control {
-      @apply text-nowrap flex gap-1.5 flex-nowrap items-center justify-between;
-    }
-
-    .wish-item .quantityBtn {
-      @apply bg-transparent  bg-orange-500 text-yellow-50 max-w-8 inline-flex items-center justify-center p-0.5;
-    }
-
-    .price {
-      @apply text-lg font-semibold text-right flex flex-nowrap gap-1 items-center;
-    }
-    .wish-item button {
-      @apply justify-self-end lg:self-center w-fit flex justify-end bg-red-500 p-1.5 rounded transition text-white active:scale-95;
-    }
-  }
-</style>
 
 <script is:inline>
   // Verifica si localList ya está definida antes de declararla
@@ -110,15 +79,15 @@ import StoreIcon from "./resources/icons/StoreIcon.astro";
   var MAX_CANT_ITEM = 20;
 
   function getWishList() {
-    const wishList = JSON.parse(localStorage.getItem("wishList")) || [];
+    const wishList = JSON.parse(localStorage.getItem("wishListBonitaGlam")) || [];
     if (wishList.length === 0) {
-      localStorage.setItem("wishList", JSON.stringify([]));
+      localStorage.setItem("wishListBonitaGlam", JSON.stringify([]));
     }
     return wishList;
   }
 
   function setWishList() {
-    localStorage.setItem("wishList", JSON.stringify(localList));
+    localStorage.setItem("wishListBonitaGlam", JSON.stringify(localList));
   }
 
   function updateItemQuantity(itemTitle, delta) {
@@ -145,7 +114,7 @@ import StoreIcon from "./resources/icons/StoreIcon.astro";
     if (!wishListElement) return;
 
     if (localList.length === 0) {
-      wishListElement.innerHTML = `<span class='col-span-full text-center inline-block pt-2'>¡La lista está vacía! <a href="/categories" class="text-orange-500 font-sembold"> ¡Agrega algún producto! </a></span>`;
+      wishListElement.innerHTML = `<span class='col-span-full text-center inline-block pt-2'>¡La lista está vacía! <a href="/categories" class="text-primary font-sembold"> ¡Agrega algún producto! </a></span>`;
       return;
     }
 
