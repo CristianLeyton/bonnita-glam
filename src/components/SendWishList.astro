@@ -39,7 +39,7 @@ import { contact } from "./Footer.astro";
   </div>
 </header>
 
-<span id="totalWishList" class="w-full p-1">
+<span id="totalWishList" class="w-full p-2 text-[#1c1c1c]">
   <div
     class="w-full text-left grid grid-cols-5 font-semibold text-base md:text-sm xl:text-base"
   >
@@ -58,7 +58,7 @@ import { contact } from "./Footer.astro";
   </div>
 
   <div
-    class="border-t border-neutral-200 flex justify-between w-full mt-1 py-2 font-bold"
+    class="border-t border-[#e5e5e5] flex justify-between w-full mt-1 py-2 font-bold text-[#1c1c1c]"
   >
     <h3 class="">Total:</h3>
     <span
@@ -67,12 +67,6 @@ import { contact } from "./Footer.astro";
     >
   </div>
 </span>
-
-<style>
-  #totalWishList {
-
-  }
-</style>
 
 <script>
   import html2canvas from "html2canvas";
@@ -85,6 +79,10 @@ import { contact } from "./Footer.astro";
       localStorage.setItem("wishList", JSON.stringify([])); //Comprueba si ya existe o no, y la crea
     }
     return WishList;
+  }
+
+  function roundPrice(price: number) {
+    return Math.round(price * 100) / 100;
   }
 
   function calculateWishList() {
@@ -106,12 +104,16 @@ import { contact } from "./Footer.astro";
           let name = document.createElement("span");
           name.classList.add("text-left");
           name.classList.add("col-span-3");
-          name.textContent = item.title;
+          if (item.color) {
+            name.innerHTML += item.title + " - " + item.colorName;
+          } else {
+            name.textContent = item.title;
+          }
 
           let price = document.createElement("span");
           price.classList.add("text-right");
           //@ts-ignore
-          price.textContent = `$${item.quantity * item.price}`;
+          price.textContent = `$${roundPrice(item.quantity * item.price)}`;
 
           sendWishList.insertAdjacentElement("beforeend", name);
           sendWishList.insertAdjacentElement("beforeend", cant);
@@ -125,7 +127,7 @@ import { contact } from "./Footer.astro";
         sum = sum + Number(item.quantity * item.price);
       });
       //@ts-ignore
-      totalList.innerHTML = `$${sum}`;
+      totalList.innerHTML = `$${roundPrice(sum)}`;
 
       //Configuro los botones para que se puedan enviar los datos por ellos
       setBtnWsp();
@@ -142,16 +144,20 @@ import { contact } from "./Footer.astro";
     const numeroTelefono = btnWsp?.getAttribute("href");
 
     // Formatea los datos en un mensaje de texto
-    let mensaje = "Mi lista:\n\n";
+    let mensaje = "Mi pedido:\n\n";
     let total = 0;
 
     productos.forEach((producto: any, index: number) => {
       mensaje += `${index + 1}. ${producto.title}\n`;
+      if (producto.color) {
+        mensaje += `      Color: ${producto.colorName}\n`;
+      }
       mensaje += `      Cantidad: ${producto.quantity}\n`;
-      mensaje += `      Precio: $${producto.price * producto.quantity}\n`;
+      mensaje += `      Precio: $${roundPrice(producto.price * producto.quantity)}\n`;
       mensaje += `      SKU: ${producto.sku}\n\n`;
 
       total = total + producto.price * producto.quantity;
+      total = roundPrice(total);
     });
 
     mensaje += `*Total: $${total}*`;
@@ -165,6 +171,8 @@ import { contact } from "./Footer.astro";
     btnWsp?.setAttribute("href", urlWhatsApp);
   }
 
+
+
   function setBtnEmail() {
     const productos = getWishList();
     const btnEmail = document.querySelector("#btnEmail");
@@ -172,16 +180,20 @@ import { contact } from "./Footer.astro";
   
 
     // Formatea los datos en un mensaje de texto
-    let mensaje = "Mi lista:\n\n";
+    let mensaje = "Mi pedido:\n\n";
     let total = 0;
 
     productos.forEach((producto: any, index: number) => {
       mensaje += `${index + 1}. ${producto.title}\n`;
+      if (producto.color) {
+        mensaje += `      Color: ${producto.colorName}\n`;
+      }
       mensaje += `      Cantidad: ${producto.quantity}\n`;
-      mensaje += `      Precio: $${producto.price * producto.quantity}\n`;
+      mensaje += `      Precio: $${roundPrice(producto.price * producto.quantity)}\n`;
       mensaje += `      SKU: ${producto.sku}\n\n`;
 
       total += producto.price * producto.quantity;
+      total = roundPrice(total);
     });
 
     mensaje += `Total: $${total}`;
@@ -202,19 +214,22 @@ import { contact } from "./Footer.astro";
     const productos = getWishList();
 
     // Formatea los datos en un mensaje de texto
-    let mensaje = "Mi lista:\n\n";
+    let mensaje = "Mi pedido:\n\n";
     let total = 0;
 
     productos.forEach((producto: any, index: number) => {
       mensaje += `${index + 1}. ${producto.title}\n`;
+      if (producto.color) {
+        mensaje += `      Color: ${producto.colorName}\n`;
+      }
       mensaje += `      Cantidad: ${producto.quantity}\n`;
-      mensaje += `      Precio: $${producto.price * producto.quantity}\n`;
+      mensaje += `      Precio: $${roundPrice(producto.price * producto.quantity)}\n`;
       mensaje += `      SKU: ${producto.sku}\n\n`;
 
       total += producto.price * producto.quantity;
     });
 
-    mensaje += `Total: $${total}`;
+    mensaje += `Total: $${roundPrice(total)}`;
 
     // Usa la API de Portapapeles para copiar el mensaje
     navigator.clipboard
@@ -247,7 +262,7 @@ import { contact } from "./Footer.astro";
     html2canvas(wishList, options).then((canvas) => {
       // Crear un enlace para descargar
       const link = document.createElement("a");
-      link.download = "mi-lista-de-deseos.png";
+      link.download = "mi-pedido-bonnitaglammakeup.png";
       link.href = canvas.toDataURL("image/png");
       link.click();
     });

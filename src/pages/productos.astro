@@ -214,6 +214,8 @@ let { title = "Todos los productos" } = Astro.props;
         });
     }
 
+
+
     function createProductCard(product: any) {
       const productCard = document.createElement("div");
       productCard.classList.add("product-card");
@@ -276,7 +278,6 @@ let { title = "Todos los productos" } = Astro.props;
         "btnAddToWishList bg-red-700 text-secondary cursor-pointer p-1 rounded hover:-translate-y-0.5 transition";
       button.title = "Agregar al pedido";
       button.addEventListener("click", (e) => {
-        console.log("click");
         //@ts-ignore
         const card = e.target.closest(".productCard");
 
@@ -287,12 +288,15 @@ let { title = "Todos los productos" } = Astro.props;
           sku: card.getAttribute("data-sku"),
           color: card.getAttribute("data-color"),
           colorName: card.getAttribute("data-color-name"),
+          maxQuantity: card.getAttribute("data-max-quantity"),
           quantity: 1,
         };
 
+        // Compara por título y color
         const existItem = localWishList.find(
-          (itemList: any) => itemList.title == item.title
-        ); //busca si ya existe algun item con el mismo nombre en la lista de deseos
+          (itemList: any) =>
+            itemList.title === item.title && itemList.color === item.color
+        );
 
         if (existItem) {
           if (existItem.quantity < quantity) {
@@ -307,7 +311,12 @@ let { title = "Todos los productos" } = Astro.props;
           } else {
             window.dispatchEvent(
               new CustomEvent("user:addedProduct", {
-                detail: "Solo tenemos " + quantity + " unidades de " + item.title + ". 😢",
+                detail:
+                  "Solo tenemos " +
+                  quantity +
+                  " unidades de " +
+                  item.title +
+                  ". 😢",
               })
             );
           }

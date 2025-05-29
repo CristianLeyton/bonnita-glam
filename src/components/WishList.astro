@@ -76,7 +76,6 @@ import StoreIcon from "./resources/icons/StoreIcon.astro";
   }
 
   var MIN_CANT_ITEM = 1;
-  var MAX_CANT_ITEM = 20;
 
   function getWishList() {
     const wishList = JSON.parse(localStorage.getItem("wishListBonitaGlam")) || [];
@@ -94,7 +93,7 @@ import StoreIcon from "./resources/icons/StoreIcon.astro";
     const item = localList.find(({ title }) => title === itemTitle);
     if (item) {
       const newQuantity = item.quantity + delta;
-      if (newQuantity >= MIN_CANT_ITEM && newQuantity <= MAX_CANT_ITEM) {
+      if (newQuantity >= MIN_CANT_ITEM && newQuantity <= item.maxQuantity) {
         item.quantity = newQuantity;
         setWishList();
         window.dispatchEvent(new CustomEvent("user:editQuantityProduct"));
@@ -108,47 +107,107 @@ import StoreIcon from "./resources/icons/StoreIcon.astro";
     window.dispatchEvent(new CustomEvent("user:editQuantityProduct"));
   }
 
-  function renderWishList() {
-    localList = getWishList();
-    const wishListElement = document.querySelector("#wishList");
-    if (!wishListElement) return;
+    function roundPrice(price) {
+    return Math.round(price * 100) / 100;
+  }
 
-    if (localList.length === 0) {
-      wishListElement.innerHTML = `<span class='col-span-full text-center inline-block pt-2'>¡La lista está vacía! <a href="/categories" class="text-primary font-sembold"> ¡Agrega algún producto! </a></span>`;
-      return;
+function renderWishList() {
+  localList = getWishList();
+  const wishListElement = document.querySelector("#wishList");
+  if (!wishListElement) return;
+
+  // Limpiar el contenido previo
+  wishListElement.innerHTML = "";
+
+  if (localList.length === 0) {
+    const emptyMessage = document.createElement("span");
+    emptyMessage.className = "col-span-full text-center inline-block pt-2";
+    emptyMessage.innerHTML = `¡La lista está vacía! <a href="/categories" class="text-primary font-sembold"> ¡Agrega algún producto! </a>`;
+    wishListElement.appendChild(emptyMessage);
+    return;
+  }
+
+  localList.forEach((item) => {
+    const itemDiv = document.createElement("div");
+    itemDiv.className = "wish-item";
+
+    const img = document.createElement("img");
+    img.src = item.image;
+    img.alt = item.title;
+
+    const h5 = document.createElement("h5");
+    h5.textContent = item.title;
+
+    if (item.color) {
+    h5.appendChild(document.createElement("br"));
+
+    const colorContainer = document.createElement("div");
+    colorContainer.className = "flex gap-2 items-center";
+
+    const colorBox = document.createElement("span");
+    colorBox.className = "block size-4 rounded";
+    colorBox.style.backgroundColor = item.color;
+
+    const colorText = document.createTextNode(item.colorName);
+    colorContainer.appendChild(colorBox);
+    colorContainer.appendChild(colorText);
+    h5.appendChild(colorContainer);
     }
 
-    wishListElement.innerHTML = localList
-      .map(
-        (item) => `
-      <div class="wish-item">
-        <img src="${item.image}" alt="${item.title}">
-        <h5>${item.title}</h5>
-        <p class="price">$${item.price} <span class='text-xs font-normal opacity-50'>c/u<span></p>
-        <div class="quantity-control">
-          <button onclick="updateItemQuantity('${item.title}', -1)" class='quantityBtn' title="Disminuir">
-            <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-full">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-            </svg>
-          </button>
-          <span>${item.quantity}</span>
-          <button onclick="updateItemQuantity('${item.title}', 1)" class='quantityBtn' title="Aumentar">
-            <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-full">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-            </svg>
-          </button>
-        </div>
-        <button onclick="removeItem('${item.title}')" title="Eliminar">
-          <svg class="size-5" viewBox="0 0 24 24" style="fill: currentColor;transform: ;msFilter:;">
-            <path d="M5 20a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8h2V6h-4V4a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v2H3v2h2zM9 4h6v2H9zM8 8h9v12H7V8z"></path>
-            <path d="M9 10h2v8H9zm4 0h2v8h-2z"></path>
-          </svg>
-        </button>
-      </div>
-    `
-      )
-      .join("");
-  }
+    const pPrice = document.createElement("p");
+    pPrice.className = "price";
+    pPrice.innerHTML = `$${roundPrice(item.price)} <span class='text-xs font-normal opacity-50'>c/u</span>`;
+
+    const quantityControl = document.createElement("div");
+    quantityControl.className = "quantity-control";
+
+    const btnDecrease = document.createElement("button");
+    btnDecrease.className = "quantityBtn";
+    btnDecrease.title = "Disminuir";
+    btnDecrease.onclick = () => updateItemQuantity(item.title, -1);
+    btnDecrease.innerHTML = `
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-full">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+      </svg>
+    `;
+
+    const quantitySpan = document.createElement("span");
+    quantitySpan.textContent = item.quantity;
+
+    const btnIncrease = document.createElement("button");
+    btnIncrease.className = "quantityBtn";
+    btnIncrease.title = "Aumentar";
+    btnIncrease.onclick = () => updateItemQuantity(item.title, 1);
+    btnIncrease.innerHTML = `
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-full">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+      </svg>
+    `;
+
+    quantityControl.appendChild(btnDecrease);
+    quantityControl.appendChild(quantitySpan);
+    quantityControl.appendChild(btnIncrease);
+
+    const btnRemove = document.createElement("button");
+    btnRemove.title = "Eliminar";
+    btnRemove.onclick = () => removeItem(item.title);
+    btnRemove.innerHTML = `
+      <svg class="size-5" viewBox="0 0 24 24" style="fill: currentColor;">
+        <path d="M5 20a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8h2V6h-4V4a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v2H3v2h2zM9 4h6v2H9zM8 8h9v12H7V8z"></path>
+        <path d="M9 10h2v8H9zm4 0h2v8h-2z"></path>
+      </svg>
+    `;
+
+    itemDiv.appendChild(img);
+    itemDiv.appendChild(h5);
+    itemDiv.appendChild(pPrice);
+    itemDiv.appendChild(quantityControl);
+    itemDiv.appendChild(btnRemove);
+
+    wishListElement.appendChild(itemDiv);
+  });
+}
+
 
   function deleteAllList() {
     const deleteListModal = document.querySelector("#deleteListModal");
