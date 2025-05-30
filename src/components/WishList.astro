@@ -105,6 +105,11 @@ import StoreIcon from "./resources/icons/StoreIcon.astro";
     localList = localList.filter(({ title }) => title !== itemTitle);
     setWishList();
     window.dispatchEvent(new CustomEvent("user:editQuantityProduct"));
+                window.dispatchEvent(
+              new CustomEvent("user:addedProduct", {
+                detail: "Se eliminó un producto. 😢",
+              })
+            );
   }
 
     function roundPrice(price) {
@@ -235,7 +240,7 @@ function renderWishList() {
       deleteListModal.close();
       window.dispatchEvent(
         new CustomEvent("user:addedProduct", {
-          detail: "Se vació la lista",
+          detail: "Se vació la lista de productos. 😰",
         })
       );
     });

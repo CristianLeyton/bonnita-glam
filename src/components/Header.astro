@@ -82,7 +82,7 @@ import WishListIcon from "./resources/icons/WishListIcon.astro";
     setCounterList();
 
     function setCounterList() {
-      const wishList = JSON.parse(localStorage.getItem("wishList"));
+      const wishList = JSON.parse(localStorage.getItem("wishListBonitaGlam"));
       if (wishList) {
         counterList.textContent = wishList.length;
       }

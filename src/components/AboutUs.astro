@@ -1,0 +1,115 @@
+---
+import Title from "@components/resources/Title.astro";
+import InfoCard from "./resources/InfoCard.astro";
+import image1 from "/public/src/images/1.webp";
+import image2 from "/public/src/images/2.webp";
+import image3 from "/public/src/images/3.webp";
+---
+
+<section
+  id="nosotros"
+  class="pb-5 md:pb-10 px-2 scroll-m-[21rem] md:scroll-m-24"
+>
+  <Title title="Nuestra empresa" subtitle="Conocenos un poco mejor" />
+
+  <article class="flex flex-col mt-5 md:flex-row md:items-center">
+    <div
+      class="flex flex-col gap-5 bg-rose-200/80 rounded-2xl p-5 pb-24 md:p-10 md:pr-24"
+    >
+      <p class="text-xl md:text-2xl font-bold text-pretty font-times-new-roman">
+        En <span class="text-primary font-bonita-losta-bold text-lg md:text-xl"
+          >Bonnita</span
+        > creemos que el maquillaje es más que solo productos 🌷, <br> es una herramienta
+        para expresarte, brillas y sentirte segura cada dia.
+      </p>
+
+      <div class="flex flex-col gap-3 text-neutral-600 infoOne">
+        <div id="infoOne" class="active-card info-card infoOne">
+          <InfoCard title="Maquillate como sos" className="infoOne">
+            El maquillaje no es para esconderte, es para mostrarte. Es una forma
+            hermosa de decir “acá estoy” sin tener que hablar. Usalo como
+            quieras, cuando quieras. Porque no hay reglas cuando se trata de ser
+            vos misma.
+          </InfoCard>
+        </div>
+
+        <div id="infoTwo" class="info-card infoTwo">
+          <InfoCard title="Sentite segura, todos los días" className="infoTwo">
+            Sabemos lo lindo que es mirarte al espejo y sonreír. Por eso, cada
+            uno de nuestros productos está pensado para acompañarte en esos días
+            en que querés romperla, y también en los que solo necesitás un mimo.
+          </InfoCard>
+        </div>
+
+        <div id="infoThree" class="info-card infoThree">
+          <InfoCard
+            title="Hecho con amor (y experiencia)"
+            className="infoThree"
+          >
+            Llevamos años compartiendo esta pasión con mujeres increíbles como
+            vos. Nos mueve ayudarte a brillar y que sientas que el maquillaje es
+            más que color: es una herramienta para empoderarte y quererte cada
+            día un poquito más.
+          </InfoCard>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="image-info"
+      data-image-1={image1.src}
+      data-image-2={image2.src}
+      data-image-3={image3.src}
+      class="aspect-video md:aspect-auto m-5 bg-center bg-cover rounded-xl -mt-20 md:min-h-[28rem] md:-ml-16 md:mt-0 md:w-full"
+      style=`background-image: url('${image1.src}')`
+      title="La empresa"
+    >
+    </div>
+  </article>
+</section>
+
+<style is:inline>
+  .active-card button {
+    background-color: #fff6f7;
+    border-radius: 0.75rem;
+    --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color),
+      0 1px 2px -1px var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
+      var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+    color: #1c1c1c;
+  }
+
+  .active-card h4 {
+    color: #95001c !important;
+  }
+</style>
+
+<script is:inline>
+  document.addEventListener("astro:page-load", () => {
+    const cards = document.querySelectorAll(".info-card");
+    const imageInfo = document.querySelector("#image-info");
+
+    if (cards && imageInfo) {
+      const image1 = imageInfo.getAttribute("data-image-1");
+      const image2 = imageInfo.getAttribute("data-image-2");
+      const image3 = imageInfo.getAttribute("data-image-3");
+
+      cards.forEach((card) => {
+        card.addEventListener("click", (e) => {
+          cards.forEach((card) => {
+            card.classList.remove("active-card");
+          });
+          card.classList.add("active-card");
+
+          if (e.target.classList.contains("infoOne"))
+            imageInfo.style = `background-image: url('${image1}')`;
+          if (e.target.classList.contains("infoTwo"))
+            imageInfo.style = `background-image: url('${image2}')`;
+          if (e.target.classList.contains("infoThree"))
+            imageInfo.style = `background-image: url('${image3}')`;
+        });
+      });
+    }
+  });
+</script>
