@@ -3,6 +3,7 @@ import InfoIcon from "@components/resources/icons/InfoIcon.astro";
 import Layout from "@layouts/Layout.astro";
 import WishList from "@components/WishList.astro";
 import SendWishList from "@components/SendWishList.astro";
+import ConfirmWishList from "@components/ConfirmWishList.astro";
 
 
 ---
@@ -23,14 +24,15 @@ import SendWishList from "@components/SendWishList.astro";
       </div>
     </header>
     <main
-      class="bg-secondary/60 dark:bg-rose-200/80 rounded-lg p-4 flex flex-col gap-1 items-center shadow md:col-span-3 h-fit"
+      class="bg-secondary/60 dark:bg-rose-200/80 rounded-lg p-4 flex flex-col gap-1 w-full shadow md:col-span-3 h-fit"
     >
       <WishList/>
     </main>
     <aside
-      class="bg-secondary/60 dark:bg-rose-200/80 rounded-lg p-4 flex flex-col gap-1 items-center shadow h-fit md:col-span-2 overflow-hidden"
+      class=" flex flex-col gap-3 items-center md:col-span-2 overflow-hidden"
     >
       <SendWishList/>
+      <ConfirmWishList/>
     </aside>
   </section>
 </Layout>

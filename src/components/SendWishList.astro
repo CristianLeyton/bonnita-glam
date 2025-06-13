@@ -3,39 +3,56 @@ import CopyIcon from "./resources/icons/CopyIcon.astro";
 import EmailIcon from "./resources/icons/EmailIcon.astro";
 import WhatsAppIcon from "./resources/icons/WhatsAppIcon.astro";
 import DownloadIcon from "@components/resources/icons/DownloadIcon.astro";
+import ShareIcon from "@components/resources/icons/ShareIcon.astro";
 import { contact } from "./Footer.astro";
 ---
+
+
+<div class="bg-secondary/60 dark:bg-rose-200/80 rounded-lg p-4 flex flex-col gap-1 w-full shadow h-fit md:col-span-2 overflow-hidden">
 
 <header
   class="flex gap-2 w-full justify-between items-center border-b pb-2 border-neutral-200"
 >
-  <h3 class="font-bold">Enviar</h3>
+  <h3 class="font-bold">Detalle</h3>
 
-  <div class="flex items-center *:rounded text-white gap-2">
+  <div class="flex items-center *:rounded text-white gap-2 relative">
     <button
-      id="btnCopy"
+      id="btnShare"
       class="p-1 hover:-translate-y-0.5 transition bg-primary cursor-pointer"
-      title="Copiar"><CopyIcon /></button
+      title="Compartir"
     >
-    <button
-      id="btnDownload"
-      class="p-1 hover:-translate-y-0.5 transition bg-indigo-500 cursor-pointer"
-      title="Descargar Imagen"
-      ><DownloadIcon />
+      <ShareIcon />
     </button>
-    <a
-      href=""
-      id="btnEmail"
-      class="p-1 hover:-translate-y-0.5 transition bg-cyan-500 cursor-pointer"
-      title="Enviar por Mail"><EmailIcon /></a
+
+    <div
+      id="divButtons"
+      class="*:rounded bg-secondary dark:bg-rose-200 p-2 shadow absolute top-10 right-0 hidden gap-1 items-center"
     >
-    <a
-      href=`${contact.phone}`
-      id="btnWsp"
-      target="_blank"
-      class="p-1 hover:-translate-y-0.5 transition bg-green-500 cursor-pointer"
-      title="Enviar por WhatsApp"><WhatsAppIcon /></a
-    >
+      <button
+        id="btnCopy"
+        class="p-1 hover:-translate-y-0.5 transition bg-primary cursor-pointer"
+        title="Copiar"><CopyIcon /></button
+      >
+      <button
+        id="btnDownload"
+        class="p-1 hover:-translate-y-0.5 transition bg-indigo-500 cursor-pointer"
+        title="Descargar Imagen"
+        ><DownloadIcon />
+      </button>
+      <a
+        href=""
+        id="btnEmail"
+        class="p-1 hover:-translate-y-0.5 transition bg-cyan-500 cursor-pointer"
+        title="Enviar por Mail"><EmailIcon /></a
+      >
+      <a
+        href=`${contact.phone}`
+        id="btnWsp"
+        target="_blank"
+        class="p-1 hover:-translate-y-0.5 transition bg-green-500 cursor-pointer"
+        title="Enviar por WhatsApp"><WhatsAppIcon /></a
+      >
+    </div>
   </div>
 </header>
 
@@ -43,7 +60,7 @@ import { contact } from "./Footer.astro";
   <div
     class="w-full text-left grid grid-cols-5 font-semibold text-base md:text-sm xl:text-base"
   >
-  <span class="col-span-3"> Nombre </span>
+    <span class="col-span-3"> Nombre </span>
     <span class="text-ellipsis text-center overflow-hidden pb-2">
       <span class="hidden xl:inline-block">Cantidad</span>
       <span class="inline-block xl:hidden">Cant.</span>
@@ -61,12 +78,26 @@ import { contact } from "./Footer.astro";
     class="border-t border-[#e5e5e5] flex justify-between w-full mt-1 py-2 font-bold text-[#1c1c1c]"
   >
     <h3 class="">Total:</h3>
-    <span
-      >
-      <span id="totalList">0</span></span
-    >
+    <span> <span id="totalList">0</span></span>
   </div>
 </span>
+</div>
+<style>
+  .open-menu-animation {
+    animation: open-menu 0.2s ease-in-out forwards;
+  }
+
+  @keyframes open-menu {
+    from {
+      opacity: 0;
+      transform: translateY(-5%);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
 
 <script>
   import html2canvas from "html2canvas";
@@ -133,12 +164,13 @@ import { contact } from "./Footer.astro";
       setBtnWsp();
       setBtnEmail();
       // Asigna la función al evento de clic del botón
-      document?.querySelector("#btnCopy")?.addEventListener("click", copyListToClipboard);
+      document
+        ?.querySelector("#btnCopy")
+        ?.addEventListener("click", copyListToClipboard);
     }
   }
 
   function setBtnWsp() {
-
     const productos = getWishList();
     const btnWsp = document.querySelector("#btnWsp");
     const numeroTelefono = btnWsp?.getAttribute("href");
@@ -171,13 +203,10 @@ import { contact } from "./Footer.astro";
     btnWsp?.setAttribute("href", urlWhatsApp);
   }
 
-
-
   function setBtnEmail() {
     const productos = getWishList();
     const btnEmail = document.querySelector("#btnEmail");
     const email = btnEmail?.getAttribute("href");
-  
 
     // Formatea los datos en un mensaje de texto
     let mensaje = "Mi pedido:\n\n";
@@ -268,12 +297,43 @@ import { contact } from "./Footer.astro";
     });
   }
 
+
   document.addEventListener("astro:page-load", calculateWishList);
   document.addEventListener("astro:page-load", () => {
+
+      const divButtons = document.querySelector("#divButtons");
+  function showButtons() {
+    if (divButtons) {
+      divButtons.classList.toggle("open-menu-animation");
+      divButtons.classList.toggle("hidden");
+      divButtons.classList.toggle("flex");
+    }
+  }
+
     const btnDownload = document.querySelector("#btnDownload");
     if (btnDownload) {
       btnDownload.addEventListener("click", downloadAsImage);
     }
+
+    const btnShare = document.querySelector("#btnShare");
+    if (btnShare) {
+      btnShare.addEventListener("click", showButtons);
+    }
+
+    document.addEventListener("click", (event) => {
+    if (
+      divButtons &&
+      !divButtons.classList.contains("hidden") &&
+      //@ts-ignore
+      !divButtons.contains(event.target) &&
+      //@ts-ignore
+      !btnShare?.contains(event.target) //Fijate que no cierre el menu cuando clickeo el boton de compartir instantaneamente
+    ) {
+      // Ocultar el menú
+      divButtons.classList.remove("open-menu-animation", "flex");
+      divButtons.classList.add("hidden");
+    }
+  });
   });
   window.addEventListener("user:addedProduct", calculateWishList);
   window.addEventListener("user:editQuantityProduct", calculateWishList);

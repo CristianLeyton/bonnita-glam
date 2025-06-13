@@ -1,0 +1,243 @@
+---
+import InfoIcon from "./resources/icons/InfoIcon.astro";
+---
+
+<div
+  class="bg-secondary/60 dark:bg-rose-200/80 rounded-lg p-4 flex flex-col gap-3 w-full shadow h-fit md:col-span-2 overflow-hidden"
+>
+  <header
+    class="flex gap-2 w-full justify-between items-center border-b pb-2 border-neutral-200"
+  >
+    <h3 class="font-bold">Enviar pedido</h3>
+  </header>
+  <form
+    action=""
+    class="flex flex-col gap-2 w-full *:outline-none *:bg-neutral-100 dark:*:bg-rose-200 *:text-sm"
+    id="formEnviarPedido"
+  >
+    <input
+      id="name"
+      type="text"
+      placeholder="Nombre"
+      class="w-full px-4 py-2 rounded-lg"
+      required
+    />
+    <input
+      id="email"
+      type="email"
+      placeholder="Email"
+      class="w-full px-4 py-2 rounded-lg"
+      required
+    />
+    <input
+      id="phone"
+      type="text"
+      placeholder="Celular"
+      class="w-full px-4 py-2 rounded-lg"
+    />
+  </form>
+  <p class="text-xs text-primary flex items-center gap-2">
+    <InfoIcon className="inline-block size-8" /> Por favor revisa tus datos antes
+    de enviar el pedido. Te contactaremos a la brevedad.
+  </p>
+  <button
+    id="btnEnviarPedido"
+    class="bg-primary text-white p-1 rounded-lg cursor-pointer active:scale-95 transition font-bold"
+    >Enviar</button
+  >
+
+  <dialog
+    id="sendListModal"
+    class="backdrop:bg-neutral-700/30 dark:backdrop:bg-neutral-950/60 rounded-xl overflow-hidden mx-auto"
+  >
+    <div class="bg-secondary dark:bg-rose-200 p-4">
+      <header class="flex flex-col gap-3 w-full justify-center items-center">
+        <i class="text-primary rounded-full"
+          ><svg
+            class="bg-white rounded-full p-1.5 size-14"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <!--Boxicons v3.0 https://boxicons.com | License  https://docs.boxicons.com/free-->
+            <path
+              d="m20,4H4c-1.1,0-2,.9-2,2v12c0,1.1.9,2,2,2h16c1.1,0,2-.9,2-2V6c0-1.1-.9-2-2-2Zm-8.61,10.79c.18.14.4.21.61.21s.43-.07.61-.21l1.55-1.21,4.42,4.42H5.41l4.42-4.42,1.55,1.21Zm8.61-8.79v.51s-8,6.22-8,6.22L4,6.51v-.51h16Zm0,3.04v7.54s-4.24-4.24-4.24-4.24l4.24-3.3Zm-11.76,3.3l-4.24,4.24v-7.54l4.24,3.3Zm11.76,5.66h0s0,0,0,0h0Z"
+            ></path>
+          </svg></i
+        > ¿Confirmar pedido?
+      </header>
+      <p class="font-semibold text-center">
+        ¿Estás seguro? <br />
+        <span class="text-primary text-sm">
+          Cuando envies tu pedido se te enviara una copia a tu correo. <br /> Y se
+          limpiara la lista de productos actual.
+        </span>
+      </p>
+    </div>
+    <footer
+      class="flex justify-end items-center bg-primary/20 dark:bg-primary/40 gap-2 px-4 py-2"
+    >
+      <button
+        id="btnsendList"
+        class="px-3 py-1 bg-primary rounded text-white cursor-pointer"
+        >Enviar</button
+      >
+      <button
+        id="closeModalsendList"
+        class="px-3 py-1 bg-secondary rounded cursor-pointer">Cancelar</button
+      >
+    </footer>
+  </dialog>
+</div>
+
+<script type="module">
+  document.addEventListener("astro:page-load", () => {
+    const urlApi = "https://admin.bonnitaglammakeup.com.ar/api/send-mail";
+    const API_KEY = "tu_api_key_secreta_aqui"; // Reemplaza con tu clave real
+
+    const formEnviarPedido = document.querySelector("#formEnviarPedido");
+    const btnEnviarPedido = document.querySelector("#btnEnviarPedido");
+
+    btnEnviarPedido?.addEventListener("click", sendAllList);
+
+    function sendAllList() {
+      const name = formEnviarPedido.querySelector("#name").value.trim();
+      const email = formEnviarPedido.querySelector("#email").value.trim();
+      const phone = formEnviarPedido.querySelector("#phone").value.trim();
+      const subject = `Pedido de ${name}`;
+
+      const productos = getWishList();
+
+      // Formatea los datos en un mensaje de texto
+      let mensaje = "Mi pedido:\n\n";
+      let total = 0;
+
+      productos.forEach((producto, index) => {
+        mensaje += `${index + 1}. ${producto.title}\n`;
+        if (producto.color) {
+          mensaje += `      Color: ${producto.colorName}\n`;
+        }
+        mensaje += `      Cantidad: ${producto.quantity}\n`;
+        mensaje += `      Precio: $${roundPrice(producto.price * producto.quantity)}\n`;
+        mensaje += `      SKU: ${producto.sku}\n\n`;
+
+        total += producto.price * producto.quantity;
+      });
+
+      mensaje += `Total: $${roundPrice(total)}`;
+
+      const mensajeCodificado = encodeURIComponent(
+        `Celular: ${phone}\n\n${mensaje}`
+      );
+
+      const message = ` ${mensajeCodificado}`;
+
+      if (getWishList().length === 0) {
+        window.dispatchEvent(
+          new CustomEvent("user:addedProduct", {
+            detail: "¡No hay nada en la lista! 😢",
+          })
+        );
+        return;
+      }
+
+      if (!email || !name || !phone) {
+        window.dispatchEvent(
+          new CustomEvent("user:addedProduct", {
+            detail: "¡Por favor, rellena todos los campos! 👀",
+          })
+        );
+        return;
+      }
+
+      const sendListModal = document.querySelector("#sendListModal");
+      const closeModalsendTask = document.querySelector("#closeModalsendList");
+      const btnsend = document.querySelector("#btnsendList");
+
+      sendListModal.showModal();
+
+      // Evitar cerrar el modal mientras se envía
+      const preventClose = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      };
+
+      closeModalsendTask?.addEventListener("click", () =>
+        sendListModal.close()
+      );
+      sendListModal?.addEventListener("click", (event) => {
+        if (event.target === sendListModal) sendListModal.close();
+      });
+
+      // Reemplazar botón para eliminar listeners anteriores
+      const newBtnsend = btnsend.cloneNode(true);
+      btnsend.replaceWith(newBtnsend);
+
+      newBtnsend.addEventListener("click", async () => {
+        // Bloquear interacciones y enviar
+        sendListModal.addEventListener("cancel", preventClose, true);
+        sendListModal.addEventListener("click", preventClose, true);
+        newBtnsend.disabled = true;
+        newBtnsend.classList.add("opacity-75");
+        newBtnsend.innerHTML = `<svg  xmlns="http://www.w3.org/2000/svg" 
+        class="animate-spin h-4 w-4 mr-2 inline-block text-white"  
+fill="currentColor" viewBox="0 0 24 24" >
+<!--Boxicons v3.0 https://boxicons.com | License  https://docs.boxicons.com/free-->
+<path d="M12 18a2 2 0 1 0 0 4 2 2 0 1 0 0-4M12 2a2 2 0 1 0 0 4 2 2 0 1 0 0-4M7.76 19.07c-.78.78-2.05.78-2.83 0s-.78-2.05 0-2.83 2.05-.78 2.83 0 .78 2.05 0 2.83M19.07 7.76c-.78.78-2.05.78-2.83 0s-.78-2.05 0-2.83 2.05-.78 2.83 0 .78 2.05 0 2.83M4 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2M20 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2M4.93 7.76c-.78-.78-.78-2.05 0-2.83s2.05-.78 2.83 0 .78 2.05 0 2.83-2.05.78-2.83 0M16.24 19.07c-.78-.78-.78-2.05 0-2.83s2.05-.78 2.83 0 .78 2.05 0 2.83-2.05.78-2.83 0"></path>
+</svg>
+ Enviando...`;
+
+        try {
+          const res = await fetch(urlApi, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              "X-API-Key": API_KEY,
+            },
+            body: JSON.stringify({ email, subject, message }),
+          });
+
+          if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.message || "Error al enviar el correo");
+          }
+
+          await res.json();
+
+          // Limpiar estado
+          localList = [];
+          setWishList();
+          formEnviarPedido.reset();
+          sendListModal.close();
+
+          window.dispatchEvent(
+            new CustomEvent("user:addedProduct", {
+              detail: "¡Pedido enviado! ¡Muchas gracias! 😀",
+            })
+          );
+        } catch (err) {
+          console.error("Error completo:", err);
+          sendListModal.close();
+          window.dispatchEvent(
+            new CustomEvent("user:addedProduct", {
+              detail: `Ocurrió un error al enviar el pedido. 😢`,
+            })
+          );
+          window.dispatchEvent(
+            new CustomEvent("user:addedProduct", {
+              detail: `Compartelo con nosotros por correo o whatsapp. 🙏`,
+            })
+          );
+          newBtnsend.textContent = "Error 😢";
+        } finally {
+          newBtnsend.disabled = false;
+          sendListModal.removeEventListener("cancel", preventClose, true);
+          sendListModal.removeEventListener("click", preventClose, true);
+        }
+      });
+    }
+  });
+</script>
