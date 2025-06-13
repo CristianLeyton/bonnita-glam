@@ -126,8 +126,8 @@ function renderWishList() {
 
   if (localList.length === 0) {
     const emptyMessage = document.createElement("span");
-    emptyMessage.className = "col-span-full text-center inline-block pt-2";
-    emptyMessage.innerHTML = `¡La lista está vacía! <a href="/categories" class="text-primary font-sembold"> ¡Agrega algún producto! </a>`;
+    emptyMessage.className = "text-center inline-block pt-2 col-span-full w-full";
+    emptyMessage.innerHTML = `¡La lista está vacía! <a href="/productos" class="text-primary font-sembold"> ¡Agrega algún producto! </a>`;
     wishListElement.appendChild(emptyMessage);
     return;
   }
