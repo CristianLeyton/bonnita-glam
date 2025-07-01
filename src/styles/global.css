@@ -15,7 +15,7 @@
   }
 
   & img {
-    @apply max-w-12 md:max-w-28 dark:bg-neutral-200 rounded-lg transition;
+    @apply max-w-12 md:max-w-28 dark:bg-neutral-200 rounded-lg transition aspect-square object-cover;
   }
 }
 
