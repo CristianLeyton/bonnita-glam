@@ -337,7 +337,7 @@ let { title = "Todos los productos" } = Astro.props;
 
       const img = document.createElement("img");
       img.className =
-        "w-full aspect-square max-w-52 md:max-w-40 dark:bg-neutral-200 rounded-lg";
+        "w-full aspect-square object-cover max-w-52 md:max-w-40 dark:bg-neutral-200 rounded-lg";
       img.src = `${urlApi}/storage_public/${product.urlImage}`;
       img.alt = product.name;
 
