@@ -320,7 +320,7 @@ let { title = "Todos los productos" } = Astro.props;
 
       const nameSpan = document.createElement("span");
       nameSpan.className =
-        "font-semibold text-ellipsis line-clamp-1 text-nowrap text-lg";
+        "font-semibold text-ellipsis line-clamp-1 text-nowrap text-lg max-w-72";
       nameSpan.textContent = product.name;
 
       const skuSpan = document.createElement("span");
@@ -354,7 +354,7 @@ let { title = "Todos los productos" } = Astro.props;
       footer.className = "flex w-full justify-between pt-1 items-center";
 
       const price = document.createElement("span");
-      price.className = "precio font-bold text-lg";
+      price.className = "precio font-bold text-xl sm:text-lg";
       price.textContent = `$${product.price}`;
 
       // Botón (agregar al pedido)
@@ -423,7 +423,7 @@ let { title = "Todos los productos" } = Astro.props;
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
       svg.setAttribute("viewBox", "0 0 24 24");
-      svg.setAttribute("class", "size-6");
+      svg.setAttribute("class", "size-8 sm:size-6");
       svg.setAttribute("style", "fill: currentColor;transform: ;msFilter:;");
 
       const path = document.createElementNS(
