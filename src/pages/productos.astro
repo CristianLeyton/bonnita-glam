@@ -316,16 +316,16 @@ let { title = "Todos los productos" } = Astro.props;
 
       // Header
       const header = document.createElement("header");
-      header.className = "flex w-full justify-between self-start";
+      header.className = "flex w-full justify-between self-start pb-2 items-center";
 
       const nameSpan = document.createElement("span");
       nameSpan.className =
-        "font-semibold text-ellipsis line-clamp-1 text-nowrap text-lg max-w-72";
+        "font-semibold text-ellipsis line-clamp-1 text-nowrap text-lg md:text-base max-w-72";
       nameSpan.textContent = product.name;
 
       const skuSpan = document.createElement("span");
       skuSpan.className = "text-sm opacity-50";
-      skuSpan.textContent = product.sku;
+      skuSpan.textContent = `#${product.sku}`;
 
       header.appendChild(nameSpan);
       header.appendChild(skuSpan);
