@@ -13,7 +13,7 @@ import Card from "@components/resources/Card.astro";
       Array(6)
         .fill(0)
         .map((_, index) => (
-          <div class="card h-[64px] md:h-[144px] animate-pulse" ></div>
+          <div class="card h-[64px] md:h-[144px] animate-pulse" />
         ))
     }
   </article>
@@ -44,30 +44,48 @@ import Card from "@components/resources/Card.astro";
       return stringAmigable;
     }
 
-    fetch(`${urlApi}/api/categories`)
-      .then((response) => response.json())
-      .then((data) => {
-        const categories = data.data;
-        if (parent) {
-          parent.innerHTML = "";
-        }
-        categories.forEach((category:any) => {
-          const slug = convertirAStringAmigable(category.name);
-          const url = "/productos?category_slug=" + slug;
-          const card = document.createElement("a");
-          card.href = url;
-          card.classList.add("parent");
-          card.innerHTML = `
-            <a class="card">
-              <h3 class="card-title">${category.name}</h3>
-              <span><img src="${urlApi}/storage_public/${category.urlImage}" alt="${category.name}" class="card-image"></span>
-            </a>
-          `;
-          parent?.appendChild(card);
-        });
-      })
-      .catch((error) => {
-        console.error("Error al obtener las categorías:", error);
-      });
+fetch(`${urlApi}/api/categories`)
+  .then((response) => response.json())
+  .then((data) => {
+    const categories = data.data;
+
+    // Orden alfabético en español, ignorando mayúsculas/minúsculas y acentos
+    categories.sort((a: any, b: any) => 
+      a.name.trim().localeCompare(b.name.trim(), 'es', { sensitivity: 'base' })
+    );
+
+    if (parent) {
+      parent.innerHTML = `
+        <a href="/productos" class="card">
+          <h3 class="card-title">Todos los productos</h3>
+          <span>
+            <img src="/src/images/3.webp" alt="Todos los productos" class="card-image">
+          </span>
+        </a>
+      `;
+    }
+
+    categories.forEach((category: any) => {
+      const slug = convertirAStringAmigable(category.name);
+      const url = `/productos?category_slug=${slug}`;
+
+      const card = document.createElement("a");
+      card.href = url;
+      card.classList.add("card"); // Usamos solo un <a>
+      card.innerHTML = `
+        <h3 class="card-title">${category.name.trim()}</h3>
+        <span>
+          <img src="${urlApi}/storage_public/${category.urlImage}" 
+               alt="${category.name.trim()}" 
+               class="card-image">
+        </span>
+      `;
+
+      parent?.appendChild(card);
+    });
+  })
+  .catch((error) => {
+    console.error("Error al obtener las categorías:", error);
+  });
   });
 </script>

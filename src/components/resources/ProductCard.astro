@@ -46,6 +46,7 @@ import HeartIcon from "@icons/HeartIcon.astro";
 
     function getWishList() {
       //Si es la primera vez y no existe la lista de deseos, la creo
+      //@ts-ignore
       let WishList = JSON.parse(localStorage.getItem("wishList")) || [];
       if (WishList.length === 0) {
           localStorage.setItem("wishList", JSON.stringify([])); //Comprueba si ya existe o no, y la crea
@@ -75,7 +76,7 @@ import HeartIcon from "@icons/HeartIcon.astro";
         };
 
         const existItem = localWishList.find(
-          (itemList) => itemList.title == item.title
+          (itemList: any) => itemList.title == item.title
         ); //busca si ya existe algun item con el mismo nombre en la lista de deseos
         
         if (existItem) {
