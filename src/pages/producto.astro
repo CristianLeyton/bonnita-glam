@@ -1,0 +1,69 @@
+---
+import Layout from "@layouts/Layout.astro";
+---
+
+<Layout title="Productos | Bonnita Glam MakeUp">
+  <section class="grid grid-cols-1 md:grid-cols-3 place-items-center pb-4">
+    <article class="h-fit w-fit justify-between bg-secondary/60 dark:bg-rose-200/80 dark:text-gray-800 rounded-lg py-4 px-4 flex flex-col gap-1 items-center shadow">
+      <img id="productImage" src="" alt="" class="w-80 object-cover rounded-md"/>
+    </article>
+    <article class="h-fit col-span-2 justify-between bg-secondary/60 dark:bg-rose-200/80 dark:text-gray-800 rounded-lg py-4 px-4 flex flex-col gap-1 shadow">
+      <a href="" id="productCategory" class="text-xs rounded-full bg-slate-200 border border-slate-300 w-fit px-2 py-0.5"></a>
+      <h3 id="productTitle"></h3>
+      <span id="productCant"></span>
+      <span id="productSKU"></span>
+      <p id="productPrice"></p>
+      <p id="productDescription"></p>
+    </article>
+  </section>
+</Layout>
+
+<script >
+  document.addEventListener("astro:page-load", () => {
+    const urlApi = "https://admin.bonnitaglammakeup.com.ar";
+    const url = new URL(window.location.href);
+    const slug = url.searchParams.get("product_slug");
+    let productData: any = {};
+
+    fetch(`${urlApi}/api/products/${slug}`)
+      .then((response) => response.json())
+      .then((data) => {
+        productData = data.data;
+        console.log(productData);
+        drawProductPage();
+      })
+      .catch((error) => {
+        console.error("Error al obtener producto:", error);
+      });
+
+    function drawProductPage() {
+        const productImage = document.getElementById('productImage');
+        const productTitle = document.getElementById('productTitle');
+        const categoryProduct = document.getElementById('productCategory');
+        const productCant = document.getElementById('productCant');
+        const productSKU = document.getElementById('productSKU');
+        const productPrice = document.getElementById('productPrice');
+        const productDescription = document.getElementById('productDescription');
+        //@ts-ignore
+        productImage.src = `${urlApi}/storage_public/${productData.urlImage}`;
+        //@ts-ignore
+        productImage.alt = productData.name; 
+        //@ts-ignore
+        productTitle.textContent = productData.name;
+        //@ts-ignore
+        categoryProduct.textContent = productData.categorie.name;
+        //@ts-ignore
+        categoryProduct.href = `/productos?category_slug=${productData.categorie.slug}`;
+        //@ts-ignore
+        categoryProduct.textContent = productData.categorie.name;
+        //@ts-ignore
+        productCant.textContent = productData.quantity;
+        //@ts-ignore
+        productSKU.textContent = productData.sku;
+        //@ts-ignore
+        productPrice.textContent = `$${productData.price}`;
+        //@ts-ignore
+        productDescription.textContent = `${productData.description}`;
+    }
+  });
+</script>

@@ -300,7 +300,6 @@ let { title = "Todos los productos" } = Astro.props;
     }
 
     //Esta funciona hace de todo xddd
-
     function createProductCard(product: any) {
       const productCard = document.createElement("div");
       productCard.classList.add("product-card");
@@ -332,7 +331,8 @@ let { title = "Todos los productos" } = Astro.props;
       header.appendChild(skuSpan);
 
       // Main
-      const main = document.createElement("main");
+      const main = document.createElement("a");
+      main.href = `/producto?product_slug=${product.slug}`
       main.className = "flex flex-col items-center gap-3 md:gap-1";
 
       const img = document.createElement("img");
