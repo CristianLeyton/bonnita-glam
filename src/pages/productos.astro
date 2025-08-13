@@ -320,7 +320,7 @@ let { title = "Todos los productos" } = Astro.props;
 
       const nameSpan = document.createElement("span");
       nameSpan.className =
-        "font-semibold text-ellipsis line-clamp-1 text-nowrap text-lg md:text-base max-w-72";
+        "font-semibold text-ellipsis line-clamp-1 text-nowrap text-lg md:text-base max-w-[95%]";
       nameSpan.textContent = product.name;
 
       const skuSpan = document.createElement("span");
@@ -449,7 +449,6 @@ let { title = "Todos los productos" } = Astro.props;
         article.dataset.color = product.colors[0].hex_code;
         article.dataset.colorName = product.colors[0].name;
         colorContainer.className = "relative w-full mt-2";
-
         // Estado: color seleccionado (por defecto el primero)
         let selectedColor = product.colors[0];
 
