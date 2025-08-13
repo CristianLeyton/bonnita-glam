@@ -178,9 +178,9 @@ let { title = "Todos los productos" } = Astro.props;
       if (!productsList) return;
       const filtered = allProductsData.filter(
         (product: any) =>
-          product.name.toLowerCase().includes(word) ||
-          product.description.toLowerCase().includes(word) ||
-          product.sku.toLowerCase().includes(word)
+          (product.name ?? "").toLowerCase().includes(word) ||
+          (product.description ?? "").toLowerCase().includes(word) ||
+          (product.sku ?? "").toLowerCase().includes(word)
       );
 
       productsList.innerHTML = "";
