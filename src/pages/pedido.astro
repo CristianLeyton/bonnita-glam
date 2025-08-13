@@ -4,6 +4,7 @@ import Layout from "@layouts/Layout.astro";
 import WishList from "@components/WishList.astro";
 import SendWishList from "@components/SendWishList.astro";
 import ConfirmWishList from "@components/ConfirmWishList.astro";
+import ShareIcon from "@components/resources/icons/ShareIcon.astro";
 
 
 ---
@@ -17,8 +18,7 @@ import ConfirmWishList from "@components/ConfirmWishList.astro";
       >
         <p class=" ">
           Edita las cantidades que necesites y al final podras enviar tu pedido.
-          Si "copias" o "descargas" el presupuesto, puedes enviarnoslo por
-          cualquier medio.
+          Puedes enviar tu pedido desde aqui, o enviarnoslo por donde desees con el botón compartir. <ShareIcon className="text-primary inline-block border rounded mb-1 size-6 p-0.5" />
         </p>
         <InfoIcon className="text-primary size-7 min-w-6" />
       </div>

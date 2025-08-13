@@ -137,6 +137,7 @@ function renderWishList() {
     itemDiv.className = "wish-item";
 
     const img = document.createElement("img");
+    img.className = "object-cover aspect-square rounded";
     img.src = item.image;
     img.alt = item.title;
 

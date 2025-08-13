@@ -182,7 +182,10 @@ let { title = "Todos los productos" } = Astro.props;
           (product.description ?? "").toLowerCase().includes(word) ||
           (product.sku ?? "").toLowerCase().includes(word)
       );
-
+      titleCategories!.innerHTML = word
+        ? `Resultados para: <span class="text-primary">"${word}"</span>`
+        : "Todos los productos";
+      // Si no hay coincidencias, mostrar todos los productos
       productsList.innerHTML = "";
       showProducts(word ? filtered : allProductsData);
     });
