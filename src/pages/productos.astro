@@ -9,9 +9,10 @@ let { title = "Todos los productos" } = Astro.props;
 ---
 
 <Layout title="Productos | Bonnita Glam MakeUp">
-  <section class="grid md:grid-cols-3 gap-3 md:gap-6 p-2 mb-4">
+  <section class="grid md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 p-2 mb-4">
     <article class="flex flex-col gap-3">
-            <div
+      <!-- Buscador -->
+      <div
         class="px-4 md:px-6 py-4 flex flex-col gap-2 shadow h-fit overflow-hidden bg-secondary/60 dark:bg-rose-200/80 dark:text-gray-800 rounded-lg"
       >
         <input
@@ -23,6 +24,8 @@ let { title = "Todos los productos" } = Astro.props;
           class="userSearch"
         />
       </div>
+
+      <!-- Menu categorias -->
       <div
         id="categoriesNav"
         class="px-4 md:px-6 py-4 flex flex-col gap-2 shadow h-16 md:h-fit overflow-hidden bg-secondary/60 dark:bg-rose-200/80 dark:text-gray-800 rounded-lg"
@@ -58,8 +61,9 @@ let { title = "Todos los productos" } = Astro.props;
     </article>
 
     <article
-      class="w-full md:col-span-2 gap-4 grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
+      class="w-full md:col-span-2 lg:col-span-3 gap-4 grid"
     >
+      <!-- Info banner -->
       <div
         class="col-span-full h-fit w-full text-pretty p-4 text-sm bg-secondary/60 dark:bg-rose-200/80 dark:text-gray-800 rounded-lg flex justify-between items-center gap-4 shadow"
       >
@@ -73,6 +77,8 @@ let { title = "Todos los productos" } = Astro.props;
         </p>
         <InfoIcon className="text-red-700 size-7" />
       </div>
+
+      <!-- Title -->
       <h2
         class="col-span-full font-bold text-xl w-full dark:text-secondary first-letter:uppercase"
         id="title-categories"
@@ -81,10 +87,9 @@ let { title = "Todos los productos" } = Astro.props;
       </h2>
 
       <!-- Se cargaran los productos -->
-
       <div
         id="products-list"
-        class="col-span-full gap-4 grid sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
+        class="col-span-full gap-4 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"
       >
         {
           Array(12)
@@ -107,8 +112,17 @@ let { title = "Todos los productos" } = Astro.props;
   }
 </style>
 
+
+
 <script>
-  function closeMenuCategorias() {
+  document.addEventListener("astro:page-load", () => {
+    const urlApi = "https://admin.bonnitaglammakeup.com.ar";
+    const categoriesList = document.querySelector("#categories-list");
+    const titleCategories = document.querySelector("#title-categories");
+    const productsList = document.querySelector("#products-list");
+    const allProducts = document.querySelector("#allProducts");
+
+    function closeMenuCategorias() {
     const categoriesNav = document.querySelector("#categoriesNav");
     const arrowMenuNav = document.querySelector("#arrowMenuNav");
 
@@ -124,18 +138,8 @@ let { title = "Todos los productos" } = Astro.props;
         });
     }
   }
-
   // Ejecuta la función cuando se carga la página
-  document.addEventListener("astro:page-load", closeMenuCategorias);
-</script>
-
-<script>
-  document.addEventListener("astro:page-load", () => {
-    const urlApi = "https://admin.bonnitaglammakeup.com.ar";
-    const categoriesList = document.querySelector("#categories-list");
-    const titleCategories = document.querySelector("#title-categories");
-    const productsList = document.querySelector("#products-list");
-    const allProducts = document.querySelector("#allProducts");
+  closeMenuCategorias();
 
     //Solo para hacer el slug:
     function convertirAStringAmigable(texto: string) {
@@ -195,7 +199,8 @@ let { title = "Todos los productos" } = Astro.props;
         .then((response) => response.json())
         .then((data) => {
           allProductsData = data.data;
-            showProducts(allProductsData);
+          //console.log(allProductsData);
+          showProducts(allProductsData);
         })
         .catch((error) => {
           console.error("Error al obtener los productos:", error);
@@ -212,18 +217,17 @@ let { title = "Todos los productos" } = Astro.props;
         .then((response) => response.json())
         .then((data) => {
           allProductsData = data.data;
-            showProducts(allProductsData);
+          showProducts(allProductsData);
         })
         .catch((error) => {
           console.error("Error al obtener los productos:", error);
         });
     }
 
-
     function showProducts(products: any) {
       if (!productsList) return;
       productsList.innerHTML = "";
-      
+
       if (products.length === 0) {
         productsList.innerHTML = `
           <p class="text-red-700 font-semibold grid place-content-center text-xl col-span-full text-center p-3 bg-secondary/60 dark:bg-rose-200/80 dark:text-gray-800 shadow rounded-lg">
@@ -238,7 +242,6 @@ let { title = "Todos los productos" } = Astro.props;
           productsList?.appendChild(card);
         }
       });
-
     }
 
     //Consigo la lista de categorias, la muestro en el menu
@@ -247,10 +250,12 @@ let { title = "Todos los productos" } = Astro.props;
       .then((data) => {
         const categories = data.data;
 
-            // Orden alfabético en español, ignorando mayúsculas/minúsculas y acentos
-    categories.sort((a: any, b: any) => 
-      a.name.trim().localeCompare(b.name.trim(), 'es', { sensitivity: 'base' })
-    );
+        // Orden alfabético en español, ignorando mayúsculas/minúsculas y acentos
+        categories.sort((a: any, b: any) =>
+          a.name
+            .trim()
+            .localeCompare(b.name.trim(), "es", { sensitivity: "base" })
+        );
 
         if (categoriesList) {
           categoriesList.innerHTML = "";
@@ -261,8 +266,11 @@ let { title = "Todos los productos" } = Astro.props;
           item.classList.add("cursor-pointer");
           item.name = slug;
           item.addEventListener("click", (e) => {
-                  //@ts-ignore
-      inputSearchProducts.value = "";
+            //@ts-ignore
+            inputSearchProducts.value = "";
+            if (window.innerWidth < 768) {
+              closeMenuCategorias();
+            }
             getProductsByCategory(slug); //Al dar click en una categoria, se muestra la lista de productos
           });
           item.innerHTML = `
@@ -310,7 +318,8 @@ let { title = "Todos los productos" } = Astro.props;
       article.className =
         "productCard h-full justify-between bg-secondary/60 dark:bg-rose-200/80 dark:text-gray-800 rounded-lg py-4 px-4 flex flex-col gap-1 items-center shadow";
       article.title = product.name;
-      article.dataset.image = `${urlApi}/storage_public/${product.urlImage}`;
+      article.dataset.image =
+        `${urlApi}/storage_public/${product.primary_image[0]?.url}` || "";
       article.dataset.price = product.price;
       article.dataset.sku = product.sku;
       article.dataset.maxQuantity = product.quantity;
@@ -319,11 +328,12 @@ let { title = "Todos los productos" } = Astro.props;
 
       // Header
       const header = document.createElement("header");
-      header.className = "flex w-full justify-between self-start pb-2 items-center";
+      header.className =
+        "flex w-full justify-between self-start pb-2 items-center";
 
       const nameSpan = document.createElement("span");
       nameSpan.className =
-        "font-semibold text-ellipsis line-clamp-1 text-nowrap text-lg md:text-base max-w-[95%]";
+        "font-semibold text-ellipsis line-clamp-1 text-nowrap text-sm sm:text-base max-w-[95%]";
       nameSpan.textContent = product.name;
 
       const skuSpan = document.createElement("span");
@@ -335,14 +345,16 @@ let { title = "Todos los productos" } = Astro.props;
 
       // Main
       const main = document.createElement("a");
-      main.href = `/producto?product_slug=${product.slug}`
+      main.href = `/producto?product_slug=${product.slug}`;
       main.className = "flex flex-col items-center gap-3 md:gap-1";
 
       const img = document.createElement("img");
       img.className =
         "w-full aspect-square object-cover max-w-52 md:max-w-40 dark:bg-neutral-200 rounded-lg";
-      img.src = `${urlApi}/storage_public/${product.urlImage}`;
+      img.src =
+        `${urlApi}/storage_public/${product.primary_image[0]?.url}` || "";
       img.alt = product.name;
+      img.loading = "lazy";
 
       const description = document.createElement("p");
       description.className =

@@ -36,18 +36,42 @@ import InfoIcon from "./resources/icons/InfoIcon.astro";
       class="w-full px-4 py-2 rounded-lg"
       required
     />
-<!--     <input
+
+        <details class="bg-transparent rounded-lg p-2">
+      <summary class="list-none text-xs text-primary font-semibold pl-2 hover:cursor-pointer">Datos opcionales</summary>
+     <input
       id="adress"
       type="text"
       placeholder="Dirección"
-      class="w-full px-4 py-2 rounded-lg"
+      class="w-full px-2 py-2 rounded-lg outline-none"
     />
     <input
       id="cp"
       type="text"
       placeholder="Código postal"
-      class="w-full px-4 py-2 rounded-lg"
-    /> -->
+      class="w-full px-2 py-2 rounded-lg outline-none"
+    /> </details>
+
+    <details class="bg-transparent rounded-lg p-2">
+      <summary class="list-none text-xs text-primary font-semibold pl-2 hover:cursor-pointer">Ingresar código de cupón</summary>
+      <label for="" class="flex gap-2">
+      <input
+        id="coupon"
+        type="text"
+        placeholder="Cupón de descuento"
+        class="w-full px-2 py-2 rounded-lg outline-0"
+      />
+      <button
+        id="btnValidarCupon"
+        type="button"
+        class="bg-primary text-white px-3 rounded-lg cursor-pointer active:scale-95 transition font-bold"
+        title="Validar cupón"
+      >
+        Validar
+      </button>
+    </label>
+    <div id="couponResult" class="text-sm mt-1 px-4 py-2"></div>
+    </details>
   </form>
   <p class="text-xs text-primary flex items-center gap-2">
     <InfoIcon className="inline-block size-6" /> Por favor revisa tus datos antes
@@ -115,12 +139,80 @@ import InfoIcon from "./resources/icons/InfoIcon.astro";
 
     btnEnviarPedido?.addEventListener("click", sendAllList);
 
+    let descuentoAplicado = 0;
+    let couponCodeValidado = "";
+
+    const btnValidarCupon = document.querySelector("#btnValidarCupon");
+    const couponInput = document.querySelector("#coupon");
+    const couponResult = document.querySelector("#couponResult");
+
+    btnValidarCupon?.addEventListener("click", async (event) => {
+      event.preventDefault();
+      const codigo = couponInput.value.trim();
+      if (!codigo) {
+        couponResult.textContent = "Ingresa un cupón para validar";
+        couponResult.className = "text-sm text-primary mt-1";
+        return;
+      }
+
+      const productos = getWishList();
+      let total = 0;
+      productos.forEach((producto) => {
+        total += producto.price * producto.quantity;
+      });
+
+      try {
+        const res = await fetch(
+          "https://admin.bonnitaglammakeup.com.ar/api/coupons/calculate-discount",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              "X-API-Key": API_KEY,
+            },
+            body: JSON.stringify({
+              code: codigo,
+              price: total,
+            }),
+          }
+        );
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          const calc = data.data.calculation;
+          descuentoAplicado = calc.discount_amount;
+          couponCodeValidado = codigo;
+          const totalConDescuento = calc.final_price;
+
+          couponResult.innerHTML = `
+        <span class="text-primary font-bold text-sm px-2">¡Cupón válido!</span><br>
+        <span class="line-through text-sm px-2">Total anterior: $${roundPrice(calc.original_price)}</span><br>
+        <span class="block text-sm px-2">Descuento aplicado: $${roundPrice(descuentoAplicado)}</span>
+        <span class="text-primary font-bold text-base px-2">Total con descuento: $${roundPrice(totalConDescuento)}</span>
+      `;
+          couponResult.className = "text-sm mt-1";
+        } else {
+          descuentoAplicado = 0;
+          couponCodeValidado = "";
+          couponResult.innerHTML = `<span class="text-primary font-bold p-2">${data.message || "Cupón inválido o expirado."}</span>`;
+          couponResult.className = "text-sm mt-1";
+        }
+      } catch (err) {
+        descuentoAplicado = 0;
+        couponCodeValidado = "";
+        couponResult.innerHTML = `<span class="text-primary font-bold p-2">Error al validar el cupón.</span>`;
+        couponResult.className = "text-sm mt-1";
+      }
+    });
+
     function sendAllList() {
       const name = formEnviarPedido.querySelector("#name").value.trim();
       const email = formEnviarPedido.querySelector("#email").value.trim();
       const phone = formEnviarPedido.querySelector("#phone").value.trim();
-      const adress = formEnviarPedido.querySelector("#adress").value.trim();
-      const cp = formEnviarPedido.querySelector("#cp").value.trim();
+      const adress = formEnviarPedido.querySelector("#adress")?.value.trim() || "No especificada";
+      const cp = formEnviarPedido.querySelector("#cp")?.value.trim() || "No especificado";
       const subject = `Pedido de ${name}`;
 
       const productos = getWishList();
@@ -205,7 +297,7 @@ fill="currentColor" viewBox="0 0 24 24" >
  Enviando...`;
 
         try {
-/*           console.log(JSON.stringify({ email, subject, message })) */
+/*                      console.log(JSON.stringify({ email, subject, message, coupon_code: couponCodeValidado }))  */
           const res = await fetch(urlApi, {
             method: "POST",
             headers: {
@@ -213,8 +305,13 @@ fill="currentColor" viewBox="0 0 24 24" >
               Accept: "application/json",
               "X-API-Key": API_KEY,
             },
-            body: JSON.stringify({ email, subject, message }),
-          });
+            body: JSON.stringify({
+              email,
+              subject,
+              message,
+              coupon_code: couponCodeValidado,
+            }),
+          }); 
 
           if (!res.ok) {
             const errorData = await res.json();
@@ -227,6 +324,8 @@ fill="currentColor" viewBox="0 0 24 24" >
           localList = [];
           setWishList();
           formEnviarPedido.reset();
+          couponInput.value = "";
+          couponResult.textContent = "";
           sendListModal.close();
 
           window.dispatchEvent(
@@ -237,7 +336,7 @@ fill="currentColor" viewBox="0 0 24 24" >
 
           window.dispatchEvent(
             new CustomEvent("user:addedProduct", {
-              detail: 'Te contactaremos a la brevedad 🎁',
+              detail: "Te contactaremos a la brevedad 🎁",
             })
           );
         } catch (err) {

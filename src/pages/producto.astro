@@ -8,14 +8,24 @@ import ArrowRIcon from "@components/resources/icons/ArrowRIcon.astro";
     class="flex flex-col md:flex-row justify-center items-center gap-6 container mx-auto p-4"
   >
     <article
-      class="h-fit w-fit justify-between bg-secondary/60 dark:bg-rose-200/80 dark:text-gray-800 rounded-lg py-4 px-4 flex flex-col gap-1 items-center shadow"
+      class="h-fit w-fit justify-between bg-secondary/60 dark:bg-rose-200/80 dark:text-gray-800 rounded-lg py-4 px-4 flex flex-col gap-4 items-center shadow"
     >
-      <img
-        id="productImage"
-        src=""
-        alt=""
-        class="min-h-80 w-80 object-cover rounded-md animate-pulse bg-gray-200"
-      />
+            <div id="productThumbnails" class="flex gap-2 justify-center">
+        </div>
+      <div
+        id="productImageSlider"
+        class="flex flex-col items-center gap-2 w-80"
+      >
+        <img
+          id="productImage"
+          src=""
+          alt=""
+          class="min-h-80 w-80 object-cover rounded-md animate-pulse bg-gray-200"
+        />
+        <span
+          id="productImageAlt"
+          class="text-sm text-primary text-center block font-semibold"></span>
+      </div>
     </article>
     <article class="w-full md:w-[60%] justify-between flex flex-col gap-3">
       <div class="flex text-primary">
@@ -35,7 +45,11 @@ import ArrowRIcon from "@components/resources/icons/ArrowRIcon.astro";
       <main
         class="bg-secondary/60 dark:bg-rose-200/80 dark:text-gray-800 rounded-lg py-4 px-4 h-fit shadow flex flex-col gap-2 productCard"
       >
-        <h3 id="productTitle" class="font-bold text-xl bg-gray-200 min-h-6 rounded animate-pulse"></h3>
+        <h3
+          id="productTitle"
+          class="font-bold text-xl bg-gray-200 min-h-6 rounded animate-pulse"
+        >
+        </h3>
         <div class="flex text-primary gap-2 pb-3 border-b border-rose-200">
           <span
             class="text-xs rounded-full bg-pink-100 border dark:bg-rose-200 dark:border-rose-300/80 border-pink-200 w-fit px-2 py-0.5"
@@ -48,10 +62,18 @@ import ArrowRIcon from "@components/resources/icons/ArrowRIcon.astro";
             Código de producto: #<span id="productSKU"></span>
           </span>
         </div>
-        <p id="productDescription" class="pb-3 border-b border-rose-200 bg-gray-200 min-h-44 rounded animate-pulse w-full"></p>
+        <p
+          id="productDescription"
+          class="pb-3 border-b border-rose-200 bg-gray-200 min-h-44 rounded animate-pulse w-full"
+        >
+        </p>
 
         <div id="footerProductPage" class="flex justify-between items-center">
-          <p id="productPrice" class="font-bold text-xl bg-gray-200 min-h-6 rounded animate-pulse w-full"></p>
+          <p
+            id="productPrice"
+            class="font-bold text-xl bg-gray-200 min-h-6 rounded animate-pulse w-full"
+          >
+          </p>
         </div>
       </main>
     </article>
@@ -100,21 +122,22 @@ import ArrowRIcon from "@components/resources/icons/ArrowRIcon.astro";
       const article = document.querySelector(".productCard") as HTMLElement;
       const quantity = productData.quantity;
       const footerProductPage = document.getElementById("footerProductPage");
-      const productImage = document.getElementById("productImage");
       const productTitle = document.getElementById("productTitle");
       const categoryProduct = document.getElementById("productCategory");
       const productCant = document.getElementById("productCant");
       const productSKU = document.getElementById("productSKU");
       const productPrice = document.getElementById("productPrice");
       const productDescription = document.getElementById("productDescription");
+      const productImage = document.getElementById("productImage");
       //@ts-ignore
-      productImage.src = `${urlApi}/storage_public/${productData.urlImage}`;
-      productImage?.classList.remove('bg-gray-200', 'animate-pulse');
+      productImage.src =
+        `${urlApi}/storage_public/${productData.images[0]?.url}` || "";
+      productImage?.classList.remove("bg-gray-200", "animate-pulse");
       //@ts-ignore
       productImage.alt = productData.name;
       //@ts-ignore
       productTitle.textContent = productData.name;
-      productTitle?.classList.remove('bg-gray-200', 'animate-pulse', 'min-h-6');
+      productTitle?.classList.remove("bg-gray-200", "animate-pulse", "min-h-6");
       //@ts-ignore
       categoryProduct.textContent = productData.categorie.name;
       //@ts-ignore
@@ -127,12 +150,68 @@ import ArrowRIcon from "@components/resources/icons/ArrowRIcon.astro";
       productSKU.textContent = productData.sku;
       //@ts-ignore
       productPrice.textContent = `$${productData.price}`;
-      productPrice?.classList.remove('bg-gray-200', 'animate-pulse', 'min-h-6');
+      productPrice?.classList.remove("bg-gray-200", "animate-pulse", "min-h-6");
       //@ts-ignore
-      productDescription.textContent = productData.description || "Sin descripción";
-      productDescription?.classList.remove('bg-gray-200', 'animate-pulse', 'min-h-44');
-      article.dataset.color = productData.colors && productData.colors.length > 0 ? productData.colors[0].hex_code : "";
-      article.dataset.colorName = productData.colors && productData.colors.length > 0 ? productData.colors[0].name : "";
+      productDescription.textContent =
+        productData.description || "Sin descripción";
+      productDescription?.classList.remove(
+        "bg-gray-200",
+        "animate-pulse",
+        "min-h-44"
+      );
+      article.dataset.color =
+        productData.colors && productData.colors.length > 0
+          ? productData.colors[0].hex_code
+          : "";
+      article.dataset.colorName =
+        productData.colors && productData.colors.length > 0
+          ? productData.colors[0].name
+          : "";
+
+      // Slider de imágenes
+const productImageAlt = document.getElementById("productImageAlt");
+const thumbnailsContainer = document.getElementById("productThumbnails");
+
+// Inicializa el slider solo si hay imágenes
+if (productData.images && productData.images.length > 0) {
+  let currentIndex = 0;
+
+  function showImage(index: any) {
+    const imgData = productData.images[index];
+    //@ts-ignore
+    productImage.src = `${urlApi}/storage_public/${imgData.url}`;
+    //@ts-ignore
+    productImage.alt = imgData.alt_text || "";
+    //@ts-ignore
+    productImageAlt.textContent = imgData.alt_text || "";
+    // No cambia el borde aquí, solo muestra la imagen
+  }
+
+  function selectThumbnail(index: any) {
+    currentIndex = index;
+    Array.from(thumbnailsContainer!.children).forEach((thumb, i) => {
+      thumb.classList.toggle("ring-2", i === index);
+      thumb.classList.toggle("ring-primary", i === index);
+    });
+    showImage(index);
+  }
+
+  thumbnailsContainer!.innerHTML = "";
+  productData.images.forEach((img: any, idx: any) => {
+    const thumb = document.createElement("img");
+    thumb.src = `${urlApi}/storage_public/${img.url}`;
+    thumb.alt = img.alt_text || "";
+    thumb.className = "w-16 h-16 object-cover rounded cursor-pointer border border-gray-300 hover:ring-2 hover:ring-primary transition";
+    // Hover: solo muestra la imagen
+    thumb.addEventListener("mouseenter", () => showImage(idx));
+    // Click: selecciona la miniatura
+    thumb.addEventListener("click", () => selectThumbnail(idx));
+    thumbnailsContainer?.appendChild(thumb);
+  });
+
+  // Selecciona la primera miniatura al cargar
+  selectThumbnail(0);
+}
 
       // Botón (agregar al pedido)
       const button = document.createElement("button");
@@ -145,7 +224,7 @@ import ArrowRIcon from "@components/resources/icons/ArrowRIcon.astro";
 
         let item = {
           title: productData.name,
-          image: `${urlApi}/storage_public/${productData.urlImage}`,
+          image: productData.images[0] ? `${urlApi}/storage_public/${productData.images[0].url}`: "",
           price: productData.price,
           sku: productData.sku,
           color: card.getAttribute("data-color"),
@@ -215,100 +294,98 @@ import ArrowRIcon from "@components/resources/icons/ArrowRIcon.astro";
       svg.appendChild(path);
       button.appendChild(svg);
       footerProductPage?.appendChild(button);
-    
+
       // Coloresif (productData.colors && productData.colors.length > 0) {
-        const colorContainer = document.createElement("div");
-        const textColor = document.createElement("span");
-        textColor.className = "text-sm font-semibold text-primary";
-        textColor.textContent = "Elegir color:";
-        colorContainer.appendChild(textColor);
-        colorContainer.className = "relative w-full text-sm";
-        article.dataset.color = productData.colors[0].hex_code;
-        article.dataset.colorName = productData.colors[0].name;
+      const colorContainer = document.createElement("div");
+      const textColor = document.createElement("span");
+      textColor.className = "text-sm font-semibold text-primary";
+      textColor.textContent = "Elegir color:";
+      colorContainer.appendChild(textColor);
+      colorContainer.className = "relative w-full text-sm";
+      article.dataset.color = productData.colors[0].hex_code;
+      article.dataset.colorName = productData.colors[0].name;
 
-        // Estado: color seleccionado (por defecto el primero)
-        let selectedColor = productData.colors[0];
+      // Estado: color seleccionado (por defecto el primero)
+      let selectedColor = productData.colors[0];
 
-        // Botón (preview actual)
-        const dropdownBtn = document.createElement("button");
-        dropdownBtn.type = "button";
-        dropdownBtn.className = `
+      // Botón (preview actual)
+      const dropdownBtn = document.createElement("button");
+      dropdownBtn.type = "button";
+      dropdownBtn.className = `
     flex items-center justify-between w-full py-2 rounded cursor-pointer hover:text-primary
   `;
 
-        const colorCircle = document.createElement("span");
-        colorCircle.className =
-          "inline-block size-8 rounded hover:-translate-y-0.5 transition";
-        colorCircle.style.backgroundColor = selectedColor.hex_code;
+      const colorCircle = document.createElement("span");
+      colorCircle.className =
+        "inline-block size-8 rounded hover:-translate-y-0.5 transition";
+      colorCircle.style.backgroundColor = selectedColor.hex_code;
 
-        const colorLabel = document.createElement("span");
-        colorLabel.className = `font-bold`;
-        colorLabel.textContent = selectedColor.name;
+      const colorLabel = document.createElement("span");
+      colorLabel.className = `font-bold`;
+      colorLabel.textContent = selectedColor.name;
 
-        dropdownBtn.appendChild(colorLabel);
-        dropdownBtn.appendChild(colorCircle);
+      dropdownBtn.appendChild(colorLabel);
+      dropdownBtn.appendChild(colorCircle);
 
-        // Dropdown (lista de opciones)
-        const dropdownList = document.createElement("ul");
-        dropdownList.className = `
+      // Dropdown (lista de opciones)
+      const dropdownList = document.createElement("ul");
+      dropdownList.className = `
     absolute z-10 w-full mt-1 bg-secondary border rounded shadow
     max-h-40 overflow-y-auto hidden
   `;
 
-        productData.colors.forEach((color: any) => {
-          const item = document.createElement("li");
-          item.className = `
+      productData.colors.forEach((color: any) => {
+        const item = document.createElement("li");
+        item.className = `
       flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-gray-200
     `;
 
-          const itemCircle = document.createElement("span");
-          itemCircle.className = "inline-block size-8 rounded";
-          itemCircle.style.backgroundColor = color.hex_code;
+        const itemCircle = document.createElement("span");
+        itemCircle.className = "inline-block size-8 rounded";
+        itemCircle.style.backgroundColor = color.hex_code;
 
-          const itemLabel = document.createElement("span");
-          itemLabel.textContent = color.name;
+        const itemLabel = document.createElement("span");
+        itemLabel.textContent = color.name;
 
-          item.appendChild(itemLabel);
-          item.appendChild(itemCircle);
+        item.appendChild(itemLabel);
+        item.appendChild(itemCircle);
 
-          // Seleccionar color al hacer click
-          item.addEventListener("click", () => {
-            selectedColor = color;
+        // Seleccionar color al hacer click
+        item.addEventListener("click", () => {
+          selectedColor = color;
 
-            // Actualizar preview
-            colorCircle.style.backgroundColor = color.hex_code;
-            colorLabel.textContent = color.name;
+          // Actualizar preview
+          colorCircle.style.backgroundColor = color.hex_code;
+          colorLabel.textContent = color.name;
 
-            // Actualizar dataset del artículo
-            article.dataset.color = color.hex_code;
-            article.dataset.colorName = color.name;
+          // Actualizar dataset del artículo
+          article.dataset.color = color.hex_code;
+          article.dataset.colorName = color.name;
 
-            // Cerrar el dropdown
-            dropdownList.classList.add("hidden");
-
-            //console.log("Color seleccionado:", color.name, color.hex_code);
-          });
-
-          dropdownList.appendChild(item);
-        });
-
-        // Toggle del dropdown
-        dropdownBtn.addEventListener("click", (e) => {
-          e.stopPropagation(); // Evitar que se cierre inmediatamente
-          dropdownList.classList.toggle("hidden");
-        });
-
-        // Cerrar el dropdown si se hace click fuera
-        document.addEventListener("click", () => {
+          // Cerrar el dropdown
           dropdownList.classList.add("hidden");
+
+          //console.log("Color seleccionado:", color.name, color.hex_code);
         });
 
-        // Ensamblar
-        colorContainer.appendChild(dropdownBtn);
-        colorContainer.appendChild(dropdownList);
-        article.insertBefore(colorContainer, footerProductPage);
-      }
+        dropdownList.appendChild(item);
+      });
 
-    
+      // Toggle del dropdown
+      dropdownBtn.addEventListener("click", (e) => {
+        e.stopPropagation(); // Evitar que se cierre inmediatamente
+        dropdownList.classList.toggle("hidden");
+      });
+
+      // Cerrar el dropdown si se hace click fuera
+      document.addEventListener("click", () => {
+        dropdownList.classList.add("hidden");
+      });
+
+      // Ensamblar
+      colorContainer.appendChild(dropdownBtn);
+      colorContainer.appendChild(dropdownList);
+      article.insertBefore(colorContainer, footerProductPage);
+    }
   });
 </script>
