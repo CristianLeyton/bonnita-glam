@@ -277,6 +277,10 @@ let { title = "Todos los productos" } = Astro.props;
             inputSearchProducts.value = "";
             // Cierra el menú si el dispositivo es pequeño
             closeMenuCategoriasMobile();
+            // Cambia la URL sin recargar la página
+            const newUrl = `${window.location.pathname}?category_slug=${slug}`;
+            window.history.pushState({ category_slug: slug }, "", newUrl);
+
             getProductsByCategory(slug); //Al dar click en una categoria, se muestra la lista de productos
           });
           item.innerHTML = `
@@ -306,6 +310,8 @@ let { title = "Todos los productos" } = Astro.props;
       inputSearchProducts.value = "";
       // Cierra el menú si el dispositivo es pequeño
       closeMenuCategoriasMobile();
+      // Cambia la URL a la vista general
+      window.history.pushState({}, "", window.location.pathname);
       getProducts();
     });
 
