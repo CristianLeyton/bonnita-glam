@@ -60,9 +60,7 @@ let { title = "Todos los productos" } = Astro.props;
       </div>
     </article>
 
-    <article
-      class="w-full md:col-span-2 lg:col-span-3 gap-4 grid"
-    >
+    <article class="w-full md:col-span-2 lg:col-span-3 gap-4 grid">
       <!-- Info banner -->
       <div
         class="col-span-full h-fit w-full text-pretty p-4 text-sm bg-secondary/60 dark:bg-rose-200/80 dark:text-gray-800 rounded-lg flex justify-between items-center gap-4 shadow"
@@ -112,8 +110,6 @@ let { title = "Todos los productos" } = Astro.props;
   }
 </style>
 
-
-
 <script>
   document.addEventListener("astro:page-load", () => {
     const urlApi = "https://admin.bonnitaglammakeup.com.ar";
@@ -123,23 +119,34 @@ let { title = "Todos los productos" } = Astro.props;
     const allProducts = document.querySelector("#allProducts");
 
     function closeMenuCategorias() {
-    const categoriesNav = document.querySelector("#categoriesNav");
-    const arrowMenuNav = document.querySelector("#arrowMenuNav");
+      const categoriesNav = document.querySelector("#categoriesNav");
+      const arrowMenuNav = document.querySelector("#arrowMenuNav");
 
-    if (document.querySelector("#showcategoriesNav")) {
-      document
-        .querySelector("#showcategoriesNav")
-        ?.addEventListener("click", (e) => {
-          categoriesNav?.classList.toggle("h-16");
-          categoriesNav?.classList.toggle("md:h-16");
-          categoriesNav?.classList.toggle("md:h-fit");
-          arrowMenuNav?.classList.toggle("-rotate-90");
-          arrowMenuNav?.classList.toggle("rotate-90");
-        });
+      if (document.querySelector("#showcategoriesNav")) {
+        document
+          .querySelector("#showcategoriesNav")
+          ?.addEventListener("click", (e) => {
+            categoriesNav?.classList.toggle("h-16");
+            categoriesNav?.classList.toggle("md:h-16");
+            categoriesNav?.classList.toggle("md:h-fit");
+            arrowMenuNav?.classList.toggle("-rotate-90");
+            arrowMenuNav?.classList.toggle("rotate-90");
+          });
+      }
     }
-  }
-  // Ejecuta la función cuando se carga la página
-  closeMenuCategorias();
+    // Ejecuta la función cuando se carga la página
+    closeMenuCategorias();
+
+    function closeMenuCategoriasMobile() {
+      if (window.innerWidth < 768) {
+        const categoriesNav = document.querySelector("#categoriesNav");
+        const arrowMenuNav = document.querySelector("#arrowMenuNav");
+        categoriesNav?.classList.add("h-16");
+        categoriesNav?.classList.remove("md:h-fit");
+        arrowMenuNav?.classList.remove("rotate-90");
+        arrowMenuNav?.classList.add("-rotate-90");
+      }
+    }
 
     //Solo para hacer el slug:
     function convertirAStringAmigable(texto: string) {
@@ -263,14 +270,13 @@ let { title = "Todos los productos" } = Astro.props;
         categories.forEach((category: any) => {
           const slug = convertirAStringAmigable(category.name);
           const item = document.createElement("button");
-          item.classList.add("cursor-pointer");
+          item.classList.add("cursor-pointer", "text-left");
           item.name = slug;
           item.addEventListener("click", (e) => {
             //@ts-ignore
             inputSearchProducts.value = "";
-            if (window.innerWidth < 768) {
-              closeMenuCategorias();
-            }
+            // Cierra el menú si el dispositivo es pequeño
+            closeMenuCategoriasMobile();
             getProductsByCategory(slug); //Al dar click en una categoria, se muestra la lista de productos
           });
           item.innerHTML = `
@@ -298,6 +304,8 @@ let { title = "Todos los productos" } = Astro.props;
       }
       //@ts-ignore
       inputSearchProducts.value = "";
+      // Cierra el menú si el dispositivo es pequeño
+      closeMenuCategoriasMobile();
       getProducts();
     });
 
