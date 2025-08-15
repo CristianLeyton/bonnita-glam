@@ -8,7 +8,11 @@ import StoreIcon from "./resources/icons/StoreIcon.astro";
 >
   <h3 class="font-bold">Editar pedido</h3>
 
-  <div class="flex flex-nowrap gap-2 justify-end">
+</header>
+<main id="wishList" class=""></main>
+
+<footer>
+    <div class="flex flex-nowrap gap-2 justify-end mt-1.5">
     <button
       id="cleanList"
       title="Eliminar todo"
@@ -20,12 +24,11 @@ import StoreIcon from "./resources/icons/StoreIcon.astro";
       title="Ver más productos"
       class="bg-primary text-secondary inline-flex flex-nowrap items-center text-nowrap font-semibold text-sm gap-1.5 px-2 py-1.5 rounded transition hover:-translate-y-0.5"
     >
-      Ver más
+      Seguir comprando
       <StoreIcon />
     </a>
   </div>
-</header>
-<main id="wishList" class=""></main>
+</footer>
 <!-- Modal para eliminar todos los items de la lista -->
 
 <dialog
